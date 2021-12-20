@@ -1,8 +1,8 @@
 /*
-Nom, Prénom Participant 1:			, Activités paricipant1
-Nom, Prénom Participant 2:			, Activités paricipant2
-Nom, Prénom Participant 3:			, Activités paricipant3
-
+Sabatier, Juliette Participant 1:	, Activités paricipant1
+Batisse, Dylann Participant 2:	    , Activités paricipant2
+Brault, Yann Participant 3:			, Activités paricipant3
+Cousson, Antoine Participant 4:     , Activités paricipant4
 */
 
 /*
