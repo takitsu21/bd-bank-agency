@@ -132,7 +132,7 @@ begin
 	returning ref(oe) INTO refEmp5;
 
 
--- Mise à jour de la liste des pointeurs vers les employes de l'agence 1
+	-- Mise à jour de la liste des pointeurs vers les employes de l'agence 1
 
 	insert into
 	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=1) lre
@@ -167,7 +167,7 @@ begin
 	Insert into employe_o oe values (employe_t(
 	7,
 	'BEAUMARCHAIS',
-	TABPRENOMS_T('Pierre-Augustin, Caron'),
+	TABPRENOMS_T('Pierre-Augustin', 'Caron'),
 	'Secretaire',
 	1630,
 	Empty_clob(),
@@ -232,6 +232,93 @@ begin
     insert into
 	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=2) lre
 	values(refEmp10);
+
+
+
+
+-- Employes de l'agence 3
+	Insert into employe_o oe values (employe_t(
+	11,
+	'DAUDET',
+	TABPRENOMS_T('Alphonse'),
+	'Directeur',
+	15000,
+	Empty_clob(),
+	to_date('11-12-1987','DD-MM-YYYY'),
+	to_date('11-12-2000','DD-MM-YYYY'),
+	refAgency3
+	))
+	returning ref(oe) INTO refEmp11;
+	Insert into employe_o oe values (employe_t(
+	12,
+	'DIDEROT',
+	TABPRENOMS_T('Denis'),
+	'Secretaire',
+	1630,
+	Empty_clob(),
+	to_date('11-11-1970','DD-MM-YYYY'),
+	to_date('11-12-2010','DD-MM-YYYY'),
+	refAgency3
+	))
+	returning ref(oe) INTO refEmp12;
+
+	Insert into employe_o oe values (employe_t(
+	13,
+	'DUMAS',
+	TABPRENOMS_T('Alexandre'),
+	'Banquier',
+	4000,
+	Empty_clob(),
+	to_date('11-12-1983','DD-MM-YYYY'),
+	to_date('11-12-2006','DD-MM-YYYY'),
+	refAgency3
+	))
+	returning ref(oe) INTO refEm13;
+
+    Insert into employe_o oe values (employe_t(
+	14,
+	'ELUARD',
+	TABPRENOMS_T('Paul'),
+	'Vigile',
+	1500,
+	Empty_clob(),
+	to_date('11-11-1982','DD-MM-YYYY'),
+	to_date('11-12-2012','DD-MM-YYYY'),
+	refAgency3
+	))
+	returning ref(oe) INTO refEmp14;
+
+	Insert into employe_o oe values (employe_t(
+	14,
+	'FRANCE',
+	TABPRENOMS_T('Anatole'),
+	'Avocat',
+	5000,
+	Empty_clob(),
+	to_date('11-12-1969','DD-MM-YYYY'),
+	to_date('11-12-1995','DD-MM-YYYY'),
+	refAgency3
+	))
+	returning ref(oe) INTO refEmp14;
+
+-- Mise à jour de la liste des pointeurs vers les employes de l'agence 3
+
+	insert into
+	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=3) lre
+	values(refEmp11);
+	insert into
+	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=3) lre
+	values(refEmp12);
+    insert into
+	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=3) lre
+	values(refEmp13);
+    insert into
+	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=3) lre
+	values(refEmp14);
+    insert into
+	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=3) lre
+	values(refEmp15);
+
 
     -- faire les autres agences ...
 
