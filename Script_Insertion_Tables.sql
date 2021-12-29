@@ -402,8 +402,87 @@ begin
 	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=4) lre
 	values(refEmp20);
 
+	-- Employes de l'agence 5
+	Insert into employe_o oe values (employe_t(
+	21,
+	'PAGNOL',
+	TABPRENOMS_T('Marcel'),
+	'Vigile',
+	1700,
+	Empty_clob(),
+	to_date('11-12-1988','DD-MM-YYYY'),
+	to_date('11-12-2000','DD-MM-YYYY'),
+	refAgency5
+	))
+	returning ref(oe) INTO refEmp21;
+	Insert into employe_o oe values (employe_t(
+	22,
+	'PASCAL',
+	TABPRENOMS_T('Blaise'),
+	'Ingenieur',
+	4600,
+	Empty_clob(),
+	to_date('11-11-1967','DD-MM-YYYY'),
+	to_date('11-12-1980','DD-MM-YYYY'),
+	refAgency5
+	))
+	returning ref(oe) INTO refEmp22;
 
+	Insert into employe_o oe values (employe_t(
+	23,
+	'PERRAULT',
+	TABPRENOMS_T('Charles'),
+	'Banquier',
+	3700,
+	Empty_clob(),
+	to_date('11-12-1977','DD-MM-YYYY'),
+	to_date('11-12-1999','DD-MM-YYYY'),
+	refAgency5
+	))
+	returning ref(oe) INTO refEm23;
 
-    -- faire les autres agences ...
+    Insert into employe_o oe values (employe_t(
+	24,
+	'PROUST',
+	TABPRENOMS_T('Marcel'),
+	'Directeur',
+	3660,
+	Empty_clob(),
+	to_date('11-11-1968','DD-MM-YYYY'),
+	to_date('11-12-1985','DD-MM-YYYY'),
+	refAgency5
+	))
+	returning ref(oe) INTO refEmp24;
+
+	Insert into employe_o oe values (employe_t(
+	25,
+	'RABELAIS',
+	TABPRENOMS_T('François'),
+	'Analyste',
+	4235,
+	Empty_clob(),
+	to_date('11-12-1966','DD-MM-YYYY'),
+	to_date('11-12-1986','DD-MM-YYYY'),
+	refAgency5
+	))
+	returning ref(oe) INTO refEmp25;
+
+-- Mise à jour de la liste des pointeurs vers les employes de l'agence 5
+
+	insert into
+	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=5) lre
+	values(refEmp21);
+	insert into
+	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=5) lre
+	values(refEmp22);
+    insert into
+	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=5) lre
+	values(refEmp23);
+    insert into
+	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=5) lre
+	values(refEmp24);
+    insert into
+	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=5) lre
+	values(refEmp25);
 
 end;
