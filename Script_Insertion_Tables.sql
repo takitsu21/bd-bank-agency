@@ -122,54 +122,54 @@ begin
 
 -- Insertion des locations des agences --
 
-    insert INTO O_LOCATION ol values(location_t('France','Nice',"Place Mascena",42))
+    insert INTO O_LOCATION ol values(location_t('France','Nice','Place Mascena',42))
         returning ref(ol) INTO refLoc1;
-    insert INTO O_LOCATION ol values(location_t('France','Paris',"Rue de la paix",8))
+    insert INTO O_LOCATION ol values(location_t('France','Paris','Rue de la paix',8))
         returning ref(ol) INTO refLoc2;
-    insert INTO O_LOCATION ol values(location_t('Italie','Rome',"Place de la pizza",108))
+    insert INTO O_LOCATION ol values(location_t('Italie','Rome','Place de la pizza',108))
         returning ref(ol) INTO refLoc3;
-    insert INTO O_LOCATION ol values(location_t('USA','New-York',"Route du pont neuf",9))
+    insert INTO O_LOCATION ol values(location_t('USA','New-York','Route du pont neuf',9))
         returning ref(ol) INTO refLoc4;
-    insert INTO O_LOCATION ol values(location_t('France','bezier',"Route de nulle part ",2))
+    insert INTO O_LOCATION ol values(location_t('France','bezier','Route de nulle part ',2))
         returning ref(ol) INTO refLoc5;
-	insert INTO O_LOCATION ol values(location_t('USA', 'San Francisco', "Rue du bout du monde", 69))
+	insert INTO O_LOCATION ol values(location_t('USA', 'San Francisco', 'Rue du bout du monde', 69))
 		returning ref(ol) INTO refLoc6;
-	insert INTO O_LOCATION ol values(location_t('USA', 'Los Angeles', "Avenue de Venise Beach", 4))
+	insert INTO O_LOCATION ol values(location_t('USA', 'Los Angeles', 'Avenue de Venise Beach', 4))
 		returning ref(ol) INTO refLoc7;
-	insert INTO O_LOCATION ol values(location_t('Espagne', 'Madrid', "Route de la pealla", 10))
+	insert INTO O_LOCATION ol values(location_t('Espagne', 'Madrid', 'Route de la pealla', 10))
 		returning ref(ol) INTO refLoc8;
-	insert INTO O_LOCATION ol values(location_t('Norvège', 'Oslo', "Place du port", 1))
+	insert INTO O_LOCATION ol values(location_t('Norvège', 'Oslo', 'Place du port', 1))
 	returning ref(ol) INTO refLoc9;
-	insert INTO O_LOCATION ol values(location_t('France', 'Lyon', "Rue antoinette", 6))
+	insert INTO O_LOCATION ol values(location_t('France', 'Lyon', 'Rue antoinette', 6))
 		returning ref(ol) INTO refLoc10;
 
 -- Insertion des agences --
 
-	insert INTO O_AGENCY oa values(AGENCY_T(1, 'Angence les Pins', refLoc1 , LISTREFEMPLOYES_T()))
+	insert INTO O_AGENCY oa values(AGENCY_T(1, 'agence les pins', refLoc1 , listRefEmploye_T()))
 		returning ref(oa) INTO refAgency1;
-    insert INTO O_AGENCY oa values(AGENCY_T(2, 'Banque des Pins', refLoc2 , LISTREFEMPLOYES_T()))
+    insert INTO O_AGENCY oa values(AGENCY_T(2, 'banque des pins', refLoc2 , listRefEmploye_T()))
 		returning ref(oa) INTO refAgency2;
-    insert INTO O_AGENCY oa values(AGENCY_T(3, 'agenzia pineta', refLoc3 , LISTREFEMPLOYES_T()))
+    insert INTO O_AGENCY oa values(AGENCY_T(3, 'agenzia pineta', refLoc3 , listRefEmploye_T()))
 		returning ref(oa) INTO refAgency3;
-    insert INTO O_AGENCY oa values(AGENCY_T(4, 'pine forest agency', refLoc4 , LISTREFEMPLOYES_T()))
+    insert INTO O_AGENCY oa values(AGENCY_T(4, 'pine forest agency', refLoc4 , listRefEmploye_T()))
 		returning ref(oa) INTO refAgency4;
-    insert INTO O_AGENCY oa values(AGENCY_T(5, 'Agence Le cèdre', refLoc5 , LISTREFEMPLOYES_T()))
+    insert INTO O_AGENCY oa values(AGENCY_T(5, 'agence le cèdre', refLoc5 , listRefEmploye_T()))
 		returning ref(oa) INTO refAgency5;
-	insert INTO O_AGENCY oa values(AGENCY_T(6, 'cedar agency', refLoc6 , LISTREFEMPLOYES_T()))
+	insert INTO O_AGENCY oa values(AGENCY_T(6, 'cedar agency', refLoc6 , listRefEmploye_T()))
 		returning ref(oa) INTO refAgency6;
-    insert INTO O_AGENCY oa values(AGENCY_T(7, 'pine bank', refLoc7 , LISTREFEMPLOYES_T()))
+    insert INTO O_AGENCY oa values(AGENCY_T(7, 'pine bank', refLoc7 , listRefEmploye_T()))
 		returning ref(oa) INTO refAgency7;
-    insert INTO O_AGENCY oa values(AGENCY_T(8, 'agencia de pino', refLoc8 , LISTREFEMPLOYES_T()))
+    insert INTO O_AGENCY oa values(AGENCY_T(8, 'agencia de pino', refLoc8 , listRefEmploye_T()))
 		returning ref(oa) INTO refAgency8;
-    insert INTO O_AGENCY oa values(AGENCY_T(9, 'furu byrå', refLoc9 , LISTREFEMPLOYES_T()))
+    insert INTO O_AGENCY oa values(AGENCY_T(9, 'furu byrå', refLoc9 , listRefEmploye_T()))
 		returning ref(oa) INTO refAgency9;
-    insert INTO O_AGENCY oa values(AGENCY_T(10, 'Banque des cèdres', refLoc10 , LISTREFEMPLOYES_T()))
+    insert INTO O_AGENCY oa values(AGENCY_T(10, 'banque des cèdres', refLoc10 , listRefEmploye_T()))
 		returning ref(oa) INTO refAgency10;
 	
 
 -- Employes de l'agence 1  --
 
-	insert into employe_o oe values (employe_t(
+	insert into o_employe oe values (employe_t(
 	1,
 	'AGRIPPA',
 	TABPRENOMS_T('Théodore'),
@@ -182,7 +182,7 @@ begin
 	))
 	returning ref(oe) INTO refEmp1;
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	2,
 	'APOLLINAIRE',
 	TABPRENOMS_T('Guillaume'),
@@ -198,21 +198,21 @@ begin
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 1 --
 
 	insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=1) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=1) lre
 	values(refEmp1);
 	insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=1) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=1) lre
 	values(refEmp2);
 
 
 
 -- Employes de l'agence 2 --
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	3,
 	'ARAGON',
 	TABPRENOMS_T('Louis'),
-	'Planton',
+	'Vigile',
 	2000,
 	Empty_clob(),
 	to_date('11-12-1961','DD-MM-YYYY'),
@@ -221,7 +221,7 @@ begin
 	))
 	returning ref(oe) INTO refEmp3;
 
-    insert into employe_o oe values (employe_t(
+    insert into O_EMPLOYE oe values (employe_t(
 	4,
 	'BALZAC',
 	TABPRENOMS_T('Honoré'),
@@ -237,10 +237,10 @@ begin
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 2 --
 
 	insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=2) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=2) lre
 	values(refEmp3);
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=2) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=2) lre
 	values(refEmp4);
 
 
@@ -248,7 +248,7 @@ begin
 
 -- Employes de l'agence 3 --
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	5,
 	'BARTHES',
 	TABPRENOMS_T('Roland'),
@@ -261,7 +261,7 @@ begin
 	))
 	returning ref(oe) INTO refEmp5;
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	6,
 	'BAUDELAIRE',
 	TABPRENOMS_T('Charles'),
@@ -276,10 +276,10 @@ begin
 	
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 3 --
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=3) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=3) lre
 	values(refEmp5);
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=3) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=3) lre
 	values(refEmp6);
 
 
@@ -287,7 +287,7 @@ begin
 
 -- Employes de l'agence 4 --
 	
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	7,
 	'BEAUMARCHAIS',
 	TABPRENOMS_T('Pierre-Augustin', 'Caron'),
@@ -300,7 +300,7 @@ begin
 	))
 	returning ref(oe) INTO refEmp7;
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	8,
 	'BEAUVOIR',
 	TABPRENOMS_T('Simone'),
@@ -316,10 +316,10 @@ begin
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 4 --
 
 	insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=4) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=4) lre
 	values(refEmp7);
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=4) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=4) lre
 	values(refEmp8);
 
 
@@ -327,7 +327,7 @@ begin
 
 -- Employes de l'agence 5 --
 
-    insert into employe_o oe values (employe_t(
+    insert into O_EMPLOYE oe values (employe_t(
 	9,
 	'CAMUS',
 	TABPRENOMS_T('Albert'),
@@ -340,7 +340,7 @@ begin
 	))
 	returning ref(oe) INTO refEmp9;
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	10,
 	'CELINE',
 	TABPRENOMS_T('Louis-Ferdinand'),
@@ -356,10 +356,10 @@ begin
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 5 --
 
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=5) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=5) lre
 	values(refEmp9);
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=5) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=5) lre
 	values(refEmp10);
 
 
@@ -367,7 +367,7 @@ begin
 
 -- Employes de l'agence 6 --
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	11,
 	'DAUDET',
 	TABPRENOMS_T('Alphonse'),
@@ -380,7 +380,7 @@ begin
 	))
 	returning ref(oe) INTO refEmp11;
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	12,
 	'DIDEROT',
 	TABPRENOMS_T('Denis'),
@@ -396,10 +396,10 @@ begin
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 6 --
 
 	insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=6) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=6) lre
 	values(refEmp11);
 	insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=6) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=6) lre
 	values(refEmp12);
 
 
@@ -407,7 +407,7 @@ begin
 
 -- Employes de l'agence 7 --
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	13,
 	'DUMAS',
 	TABPRENOMS_T('Alexandre'),
@@ -418,9 +418,9 @@ begin
 	to_date('11-12-2006','DD-MM-YYYY'),
 	refAgency7
 	))
-	returning ref(oe) INTO refEm13;
+	returning ref(oe) INTO refEmp13;
 
-    insert into employe_o oe values (employe_t(
+    insert into O_EMPLOYE oe values (employe_t(
 	14,
 	'ELUARD',
 	TABPRENOMS_T('Paul'),
@@ -436,10 +436,10 @@ begin
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 7 --
 
 	insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=7) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=7) lre
 	values(refEmp13);
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=7) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=7) lre
 	values(refEmp14);
 
 
@@ -447,7 +447,7 @@ begin
 
 -- Employes de l'agence 8 --
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	15,
 	'FRANCE',
 	TABPRENOMS_T('Anatole'),
@@ -460,7 +460,7 @@ begin
 	))
 	returning ref(oe) INTO refEmp15;
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	16,
 	'GIRAUDOUX',
 	TABPRENOMS_T('Jean'),
@@ -476,10 +476,10 @@ begin
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 8 --
 
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=8) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=8) lre
 	values(refEmp15);
 	insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=8) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=8) lre
 	values(refEmp16);
 
 
@@ -487,7 +487,7 @@ begin
 
 -- Employes de l'agence 9 --
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	17,
 	'HUGO',
 	TABPRENOMS_T('Victor'),
@@ -500,7 +500,7 @@ begin
 	))
 	returning ref(oe) INTO refEmp17;
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	18,
 	'DE LA FONTAINE',
 	TABPRENOMS_T('JEAN'),
@@ -511,23 +511,23 @@ begin
 	to_date('11-12-2005','DD-MM-YYYY'),
 	refAgency9
 	))
-	returning ref(oe) INTO refEm18;
+	returning ref(oe) INTO refEmp18;
 
 
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 9 --
 
 	insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=9) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=9) lre
 	values(refEmp17);
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=9) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=9) lre
 	values(refEmp18);
 
 
 
 -- Employes de l'agence 10 --
 
-    insert into employe_o oe values (employe_t(
+    insert into O_EMPLOYE oe values (employe_t(
 	19,
 	'MALOT',
 	TABPRENOMS_T('Hector'),
@@ -540,7 +540,7 @@ begin
 	))
 	returning ref(oe) INTO refEmp19;
 
-	insert into employe_o oe values (employe_t(
+	insert into O_EMPLOYE oe values (employe_t(
 	20,
 	'MONTAIGNE',
 	TABPRENOMS_T('Michel','Eyquem'),
@@ -556,14 +556,14 @@ begin
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 10 --
 
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=10) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=10) lre
 	values(refEmp19);
     insert into
-	TABLE(select oa.listRefEmps from O_AGENCY oa where oa.agencyNo=10) lre
+	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=10) lre
 	values(refEmp20);
 
 
-
+    
 -- Insertion des clients dans la table des clients -- 
 
 	insert into O_CLIENT oc values (CLIENT_T(
@@ -572,6 +572,7 @@ begin
 		TABPRENOMS_T('Andre'),
 		'Ecrivain',
 		5000,
+		listRefAccount_t(),
 		Empty_clob(),
 		to_date('1-1-1947','DD-MM-YYYY'),
 		refAgency1
@@ -588,6 +589,7 @@ begin
 		TABPRENOMS_T('Albert'),
 		'Ecrivain',
 		2500,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('2-2-1957','DD-MM-YYYY'),
 		refAgency2		
@@ -601,9 +603,10 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		3,
 		'SARTRE',
-		TABPRENOMS_T('Jean-Paul')
+		TABPRENOMS_T('Jean-Paul'),
 		'Cuisinier',
 		25000,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('3-3-1964','DD-MM-YYYY'),
 		refAgency3
@@ -617,9 +620,10 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		4,
 		'JACOB',
-		TABPRENOMS_T('François')
+		TABPRENOMS_T('François'),
 		'Médecin',
-		250000,
+		99999,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('4-4-1965','DD-MM-YYYY'),
 		refAgency4
@@ -633,9 +637,10 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		5,
 		'LWOFF',
-		TABPRENOMS_T('André')
+		TABPRENOMS_T('André'),
 		'Psychologue',
 		2500,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('5-5-1965','DD-MM-YYYY'),
 		refAgency5
@@ -649,9 +654,10 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		6,
 		'MONOD',
-		TABPRENOMS_T('Jacques')
+		TABPRENOMS_T('Jacques'),
 		'Médecin',
 		5000,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('6-6-1965','DD-MM-YYYY'),
 		refAgency6
@@ -665,9 +671,10 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		7,
 		'KASTLER',
-		TABPRENOMS_T('Alfred')
+		TABPRENOMS_T('Alfred'),
 		'Chercheur',
 		1500,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('7-7-1966','DD-MM-YYYY'),
 		refAgency7
@@ -681,9 +688,10 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		8,
 		'CASSIN',
-		TABPRENOMS_T('René')
+		TABPRENOMS_T('René'),
 		'Vétérinaire',
 		7200,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('8-8-1968','DD-MM-YYYY'),
 		refAgency8
@@ -697,9 +705,10 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		9,
 		'NEEL',
-		TABPRENOMS_T('Louis')
+		TABPRENOMS_T('Louis'),
 		'Cheminot',
 		4500,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('9-9-1970','DD-MM-YYYY'),
 		refAgency9
@@ -713,9 +722,10 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		10,
 		'GUILLEMIN',
-		TABPRENOMS_T('Roger')
+		TABPRENOMS_T('Roger'),
 		'Plombier',
 		1200,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('10-10-1977','DD-MM-YYYY'),
 		refAgency10
@@ -729,12 +739,13 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		11,
 		'DAUSSET',
-		TABPRENOMS_T('Jean')
+		TABPRENOMS_T('Jean'),
 		'Psychiatre',
 		8900,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('11-11-1980','DD-MM-YYYY'),
-		refAgency11
+		refAgency1
 	))
 	returning ref(oc) into refClt11;
 
@@ -745,12 +756,13 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		12,
 		'DEBREU',
-		TABPRENOMS_T('Gérard')
+		TABPRENOMS_T('Gérard'),
 		'Trader',
 		50000,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('12-12-1983','DD-MM-YYYY'),
-		refAgency12
+		refAgency2
 	))
 	returning ref(oc) into refClt12;
 
@@ -761,12 +773,13 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		13,
 		'SIMON',
-		TABPRENOMS_T('Claude')
+		TABPRENOMS_T('Claude'),
 		'Professeur',
 		2200,
+        listRefAccount_t(),
 		Empty_clob(),
-		to_date('13-1-1985-MM-YYYY'),
-		refAgency13
+		to_date('13-1-1985', 'DD-MM-YYYY'),
+		refAgency3
 	))
 	returning ref(oc) into refClt13;
 
@@ -777,12 +790,13 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		14,
 		'ALLAIS',
-		TABPRENOMS_T('Maurice')
+		TABPRENOMS_T('Maurice'),
 		'Commerical',
 		2700,
+		listRefAccount_t(),
 		Empty_clob(),
 		to_date('14-2-1988','DD-MM-YYYY'),
-		refAgency14
+		refAgency4
 	))
 	returning ref(oc) into refClt14;
 
@@ -793,12 +807,13 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		15,
 		'CHARPAK',
-		TABPRENOMS_T('Georges')
-		'Ingénieur',
+		TABPRENOMS_T('Georges'),
+		'Ingenieur',
 		4300,
+        listRefAccount_t(),
 		Empty_clob(),
 		to_date('15-3-1964','DD-MM-YYYY'),
-		refAgency15
+		refAgency5
 	))
 	returning ref(oc) into refClt15;
 
@@ -809,12 +824,13 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		16,
 		'CHAUVIN',
-		TABPRENOMS_T('Yves')
+		TABPRENOMS_T('Yves'),
 		'Laborantin',
 		1800,
+		listRefAccount_t(),
 		Empty_clob(),
 		to_date('16-4-1964','DD-MM-YYYY'),
-		refAgency16
+		refAgency6
 	))
 	returning ref(oc) into refClt16;
 
@@ -825,12 +841,13 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		17,
 		'FERT',
-		TABPRENOMS_T('Albert')
+		TABPRENOMS_T('Albert'),
 		'Laborantin',
 		1800,
+		listRefAccount_t(),
 		Empty_clob(),
 		to_date('17-5-1987','DD-MM-YYYY'),
-		refAgency17
+		refAgency7
 	))
 	returning ref(oc) into refClt17;
 
@@ -841,12 +858,13 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		18,
 		'HAROCHE',
-		TABPRENOMS_T('Serge')
+		TABPRENOMS_T('Serge'),
 		'Maçon',
 		1800,
+		listRefAccount_t(),
 		Empty_clob(),
 		to_date('18-6-1964','DD-MM-YYYY'),
-		refAgency18
+		refAgency8
 	))
 	returning ref(oc) into refClt18;
 
@@ -857,12 +875,13 @@ begin
 	insert into O_CLIENT oc values (CLIENT_T(
 		19,
 		'MOUROU',
-		TABPRENOMS_T('Gérard')
+		TABPRENOMS_T('Gérard'),
 		'Electricien',
 		2100,
+		listRefAccount_t(),
 		Empty_clob(),
 		to_date('19-7-1964','DD-MM-YYYY'),
-		refAgency19
+		refAgency9
 	))
 	returning ref(oc) into refClt19;
 
@@ -872,13 +891,14 @@ begin
 
 	insert into O_CLIENT oc values (CLIENT_T(
 		20,
-		'Boulanger',
-		TABPRENOMS_T('Paul')
+		'BOULANGER',
+		TABPRENOMS_T('Paul'),
 		'Laborantin',
 		1800,
+		listRefAccount_t(),
 		Empty_clob(),
 		to_date('20-8-1964','DD-MM-YYYY'),
-		refAgence20
+		refAgency10
 	))
 	returning ref(oc) into refClt20;
 
@@ -1061,8 +1081,12 @@ begin
 	returning ref(oact) into refAct1;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=1) lrt 
-	values(refTransac1, refTransac11);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=1) lrt 
+	values(refTransac1);
+
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=1) lrt 
+	values(refTransac11);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		2,
@@ -1075,9 +1099,13 @@ begin
 	returning ref(oact) into refAct2;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=2) lrt 
-	values(refTransac1, refTransac12);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=2) lrt 
+	values(refTransac1);
 
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=2) lrt 
+	values(refTransac12);
+	
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		3,
 		'Compte Courant',
@@ -1089,8 +1117,12 @@ begin
 	returning ref(oact) into refAct3;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=3) lrt 
-	values(refTransac2, refTransac13);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=3) lrt 
+	values(refTransac2);
+	
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=3) lrt 
+	values(refTransac13);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		4,
@@ -1103,8 +1135,12 @@ begin
 	returning ref(oact) into refAct4;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=4) lrt 
-	values(refTransac2, refTransac14);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=4) lrt 
+	values(refTransac2);
+
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=4) lrt 
+	values(refTransac14);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		5,
@@ -1117,8 +1153,11 @@ begin
 	returning ref(oact) into refAct5;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=5) lrt 
-	values(refTransac3, refTransac15);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=5) lrt 
+	values(refTransac3);
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=5) lrt 
+	values(refTransac15);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		6,
@@ -1131,8 +1170,12 @@ begin
 	returning ref(oact) into refAct6;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=6) lrt 
-	values(refTransac3, refTransac16);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=6) lrt 
+	values(refTransac3);
+
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=6) lrt 
+	values(refTransac16);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		7,
@@ -1145,8 +1188,12 @@ begin
 	returning ref(oact) into refAct7;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=7) lrt 
-	values(refTransac4, refTransac17);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=7) lrt 
+	values(refTransac4);
+
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=7) lrt 
+	values( refTransac17);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		8,
@@ -1159,8 +1206,11 @@ begin
 	returning ref(oact) into refAct8;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=8 lrt 
-	values(refTransac4, refTransac18);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=8) lrt 
+	values(refTransac4);
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=8) lrt 
+	values(refTransac18);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		9,
@@ -1173,8 +1223,12 @@ begin
 	returning ref(oact) into refAct9;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=9) lrt 
-	values(refTransac5, refTransac19);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=9) lrt 
+	values(refTransac5);
+	
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=9) lrt 
+	values(refTransac19);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		10,
@@ -1187,8 +1241,12 @@ begin
 	returning ref(oact) into refAct10;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=10) lrt 
-	values(refTransac5, refTransac20);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=10) lrt 
+	values(refTransac5);
+
+		insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=10) lrt 
+	values(refTransac20);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		11,
@@ -1196,13 +1254,19 @@ begin
 		6789,
 		30000,
 		listRefTransaction_t(),
-		refAgency11
+		refAgency1
 	))
 	returning ref(oact) into refAct11;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=11) lrt 
-	values(refTransac6, refTransac20);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=11) lrt 
+	values(refTransac6);
+
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=11) lrt 
+	values( refTransac20);
+	
+	
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		12,
@@ -1210,13 +1274,18 @@ begin
 		12678,
 		30000,
 		listRefTransaction_t(),
-		refAgency12
+		refAgency2
 	))
 	returning ref(oact) into refAct12;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=12) lrt 
-	values(refTransac6, refTransac19);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=12) lrt 
+	values(refTransac6);
+
+
+    insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=12) lrt 
+	values(refTransac19);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		13,
@@ -1224,13 +1293,17 @@ begin
 		15000,
 		60000,
 		listRefTransaction_t(),
-		refAgency13
+		refAgency3
 	))
 	returning ref(oact) into refAct13;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=13) lrt 
-	values(refTransac7, refTransac18);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=13) lrt 
+	values(refTransac7);
+	
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=13) lrt 
+	values(refTransac18);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		14,
@@ -1238,13 +1311,17 @@ begin
 		34567,
 		60000,
 		listRefTransaction_t(),
-		refAgency14
+		refAgency4
 	))
 	returning ref(oact) into refAct14;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=14) lrt 
-	values(refTransac7, refTransac17);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=14) lrt 
+	values(refTransac7);
+
+    insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=14) lrt 
+	values(refTransac17);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		15,
@@ -1252,13 +1329,17 @@ begin
 		78901,
 		90000,
 		listRefTransaction_t(),
-		refAgency15
+		refAgency5
 	))
 	returning ref(oact) into refAct15;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=15) lrt 
-	values(refTransac8, refTransac16);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=15) lrt 
+	values(refTransac8);
+
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=15) lrt 
+	values(refTransac16);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		16,
@@ -1266,13 +1347,17 @@ begin
 		12345,
 		30000,
 		listRefTransaction_t(),
-		refAgency16
+		refAgency6
 	))
 	returning ref(oact) into refAct16;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=16) lrt 
-	values(refTransac8, refTransac15);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=16) lrt 
+	values(refTransac8);
+
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=16) lrt 
+	values(refTransac15);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		17,
@@ -1280,13 +1365,17 @@ begin
 		23738,
 		40000,
 		listRefTransaction_t(),
-		refAgency17
+		refAgency7
 	))
 	returning ref(oact) into refAct17;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=17) lrt 
-	values(refTransac9, refTransac14);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=17) lrt 
+	values(refTransac9);
+
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=17) lrt 
+	values(refTransac14);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		18,
@@ -1294,13 +1383,17 @@ begin
 		9876,
 		20000,
 		listRefTransaction_t(),
-		refAgency18
+		refAgency8
 	))
 	returning ref(oact) into refAct18;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=18) lrt 
-	values(refTransac9, refTransac13);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=18) lrt 
+	values(refTransac9);
+
+    insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=18) lrt 
+	values(refTransac13);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		19,
@@ -1308,13 +1401,17 @@ begin
 		15000,
 		60000,
 		listRefTransaction_t(),
-		refAgency19
+		refAgency9
 	))
 	returning ref(oact) into refAct19;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=19) lrt 
-	values(refTransac10, refTransac12);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=19) lrt 
+	values(refTransac10);
+
+	insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=19) lrt 
+	values(refTransac12);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		20,
@@ -1322,12 +1419,17 @@ begin
 		15000,
 		60000,
 		listRefTransaction_t(),
-		refAgency20
+		refAgency10
 	))
 	returning ref(oact) into refAct20;
 
 	insert into
-	Table(select oact.listRefTransaction_t from O_ACCOUNT oact where oact.accountNo=20) lrt 
-	values(refTransac10, refTransac11);
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=20) lrt 
+	values(refTransac10);
+
+    insert into
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=20) lrt 
+	values(refTransac11);
 
 end;
+/

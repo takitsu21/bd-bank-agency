@@ -102,7 +102,7 @@ CREATE OR REPLACE type listRefEmploye_t as table of REF EMPLOYE_T
 create or replace type AGENCY_T AS OBJECT(
 	agencyNo		     number(4),
 	aName		    	varchar2(30),
-	loc			   		location_t,
+	loc			   		ref location_t,
 	listRefEmp    		listRefEmploye_t,
 	member function 	getAgency return AGENCY_T,
 	member function  	getInfoEmp return setEmployes_t,
@@ -122,7 +122,7 @@ CREATE OR REPLACE type TRANSACTION_T as OBJECT(
     tNum            number(8),
     issuer          ref CLIENT_T,
     payee           ref CLIENT_T,
-    amount         number(10, 4)
+    amount         number(11, 4)
 
 );
 /
@@ -196,9 +196,8 @@ LOB(CV) store as table_LobCV (PCTVERSION 30);
 drop table O_AGENCY cascade constraints;
 create table O_AGENCY of AGENCY_T(
 	Constraint pk_O_AGENCY_agencyNo primary key(agencyNo),
-	Constraint chk_O_AGENCY_aName check(aName=upper(aName)),
-	aName constraint nnl_O_AGENCY_aName not null,
-	loc constraint nnl_O_AGENCY_loc not null
+	Constraint chk_O_AGENCY_aName check(aName=lower(aName)),
+	aName constraint nnl_O_AGENCY_aName not null
 )
 nested table listRefEmp store as tableListRefEmp
 /
@@ -212,7 +211,7 @@ CREATE TABLE O_ACCOUNT of ACCOUNT_T(
     accountType constraint nnl_O_ACCOUNT_accountType not null,
     constraint chk_O_ACCOUNT_balance check(balance between 0 and 999999999),
     balance constraint nnl_O_ACCOUNT_balance not null,
-    constraint chk_O_ACCOUNT_bankCeiling check(bankCeiling between 0 and 10000),
+    constraint chk_O_ACCOUNT_bankCeiling check(bankCeiling between 0 and 999999999),
     bankCeiling constraint nnl_O_ACCOUNT_bankCeiling not null
 )
 nested table statements store as tableListRefTransaction
@@ -233,8 +232,8 @@ create table O_CLIENT of CLIENT_T(
     CONSTRAINT chk_O_CLIENT_cName check(cName=upper(cName)),
     cName CONSTRAINT nnl_O_CLIENT_cName  not null,
     birthDate CONSTRAINT nnl_O_CLIENT_date_naiss not null,
-    prenoms CONSTRAINT nnl_O_CLIENT_prenoms not null,
-    listRefAccount CONSTRAINT nnl_O_CLIENT_listRefAccount not null
+    prenoms CONSTRAINT nnl_O_CLIENT_prenoms not null
+    ---listRefAccount CONSTRAINT nnl_O_CLIENT_listRefAccount not null va savoir pourquoi masi il aime pas qu'on check si on en fait une nested table
 )
 LOB(project) store as table_Lobproject (PCTVERSION 30),
 nested table listRefAccount store as tableListRefAccount;
@@ -249,5 +248,6 @@ ALTER TABLE o_employe
 ALTER TABLE tableListRefEmp
 	ADD (SCOPE FOR (column_value) IS o_employe);
 
-CREATE UNIQUE INDEX idx_unique_aName ON O_AGENCY(aName)
-tablespace ts_index_res;
+CREATE UNIQUE INDEX idx_unique_aName ON O_AGENCY(aName);
+
+-- tablespace ts_index_res; ceci ne fonctionne pas, on dirait que d'apèrs la correection de king c'est implicite et le préciser fait qu'il cherche un homonyme qu'on aurait créé et il existe pas .
