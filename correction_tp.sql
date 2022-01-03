@@ -1525,35 +1525,3 @@ voir le code java dans le dossier
 A faire
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
