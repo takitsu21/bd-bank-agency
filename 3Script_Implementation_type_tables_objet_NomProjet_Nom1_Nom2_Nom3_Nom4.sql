@@ -71,6 +71,9 @@ drop type listRefAccount_t force
 CREATE OR replace type tabPrenoms_t as varray (4) of varchar2(30)
 /
 
+create or replace type LOCATION_T
+/
+
 create or replace type LOCATION_T AS OBJECT(
     country		        varchar2(50),
 	city			    varchar2(50),
@@ -78,19 +81,22 @@ create or replace type LOCATION_T AS OBJECT(
     streetNo            number(5),
 
 	map member function compLoc return varchar2,
-	static function getLoc(country IN varchar2, city IN varchar2, streetName IN varchar2, streetNo IN varchar2) return location_t,
-
-
-	--member function 	getCountry return varchar2,
-	--member function 	getCity return varchar2,
-	--member function 	getStreetName return varchar2,
-	--member function 	getstreetNo return varchar2,
+	member function getLoc return location_t,
 	
-	--member procedure 	updateCountry (country IN varchar2), 
-	--member procedure 	updateCity (city IN varchar2),
-	--member procedure 	updateStreetName (streetName IN varchar2),
-	--member procedure 	updateStreetNo (streetNo IN number)
-	 
+	-- getter --
+	member function	getCountry return varchar2
+	member function	getCity return varchar2,
+	-- member function	getStreetName return varchar2,
+	-- member function	getstreetNo return number,
+	
+	-- update LOC --
+	-- member procedure updateCountry (country1 IN varchar2), 
+	-- member procedure updateCity (city1 IN varchar2),
+	-- member procedure updateStreetName (streetName1 IN varchar2),
+	-- member procedure updateStreetNo (streetNo1 IN number),
+
+	-- delete an entry -- 
+	-- static procedure deleteLoc(loc in location_t)
 );
 /
 
@@ -109,10 +115,10 @@ CREATE OR REPLACE TYPE EMPLOYE_T AS OBJECT(
 	employementDate    date,
 	refAgency	    REF AGENCY_T,
 
-	order member function compEmp(emp IN employe_t) return number
-	static function getEmp (empNo IN number) return employe_t,
-	static function getInfoAgency (empNo IN number) return AGENCY_T,
+	order member function compEmp(emp IN employe_t) return number,
+	member function getEmploye return employe_t
 
+	-- getter
 	--member function getEmpNo return number, 
 	--member function getEName return varchar2,
 	--member function getPrenoms return
@@ -122,6 +128,7 @@ CREATE OR REPLACE TYPE EMPLOYE_T AS OBJECT(
 	--member function getBirthDate return date,
 	--member function getEmployementDate return date, 
 
+	-- update 
 	--member procedure updateName (name IN Varchar2),
 	--member procedure updatePrenom (prenom1 REF tabPrenoms_t, prenom2 REF tabPrenoms_t),
 	--member procedure addPrenom (prenom REF tabPrenoms_t),
@@ -130,7 +137,10 @@ CREATE OR REPLACE TYPE EMPLOYE_T AS OBJECT(
 	--member procedure updateSal (sal IN number),
 	--member procedure updateCV (cv IN CLOB),
 	--member procedure updateBirthDate (birthDate in date),
-	--member procedure updateEmploymentDate (employmentDate IN date)
+	--member procedure updateEmploymentDate (employmentDate IN date),
+
+	-- delete an entry
+	-- static procedure deleteEmp( emp in employe_t)
 
  
 );
@@ -145,14 +155,16 @@ create or replace type AGENCY_T AS OBJECT(
 	loc			   		ref location_t,
 	listRefEmp    		listRefEmploye_t,
 
-	static function 	getAgency (agencyNo1 IN number, nomTable IN varchar2 ) return AGENCY_T,
-	static function 	getInfoEmp (agencyNo1 IN number, nomTable IN varchar2 ) return setEmployes_t,
-	
-	map member function compAgency return number,
+	member function getAgency return AGENCY_T,
+	map member function compAgency return number
 
-	member procedure 	addLinkListeEmployes(RefEmp1 REF Employe_t, nomTable IN varchar2),
-	member procedure 	deleteLinkListeEmployes (RefEmp1 REF Employe_t, nomTable IN varchar2 ),
-	member procedure 	updateLinkListeEmployes (RefEmp1 REF Employe_t, 	RefEmp2 REF Employe_t, nomTable IN varchar2)
+
+	-- static function getInfoEmp (agencyNo1 IN number, nomTable IN varchar2 ) return listRefEmploye_t,
+	
+
+	-- member procedure 	addLinkListeEmployes(RefEmp1 REF Employe_t, nomTable IN varchar2),
+	-- member procedure 	deleteLinkListeEmployes (RefEmp1 REF Employe_t, nomTable IN varchar2 ),
+	-- member procedure 	updateLinkListeEmployes (RefEmp1 REF Employe_t, 	RefEmp2 REF Employe_t, nomTable IN varchar2)
 );
 /
 
@@ -163,8 +175,7 @@ CREATE OR REPLACE type TRANSACTION_T as OBJECT(
     tNum            number(8),
     issuer          ref CLIENT_T,
     payee           ref CLIENT_T,
-    amount         number(11, 4)
-
+    amount         number(11, 4),
 	map member function compTransaction return number
 );
 /
@@ -290,7 +301,8 @@ ALTER TABLE tableListRefEmp
 	ADD (SCOPE FOR (column_value) IS o_employe);
 
 CREATE UNIQUE INDEX idx_unique_aName ON O_AGENCY(aName)
-tablespace ts_index_res;
+/
+-- tablespace ts_index_res;
 
 
 
@@ -298,16 +310,75 @@ tablespace ts_index_res;
 ------- IMPLEMENTATION METHODS --
 
 CREATE OR REPLACE TYPE BODY location_t AS
-	map member function compLoc(loc IN location_t) return varchar2 is
+
+	member function getLoc return location_t IS
+		BEGIN
+			return self;
+		END;
+
+	map member function compLoc return varchar2 is
 		BEGIN 
 			return country||city||streetName||streetNo;
 		END;
+
+	-- getter --
+	member function	getCountry return varchar2 is 
+		begin
+			return country;
+		end;
+
+	member function	getCity return varchar2 is 
+		begin
+			return city;
+		end;
+	-- member function	getStreetName return varchar2 is 
+	-- 	begin
+	-- 		return streetName;
+	-- 	end;
+	-- member function getstreetNo return number is 
+	-- 	begin
+	-- 		return streetNo;
+	-- 	end;
+	
+	-- -- update LOC --
+	-- member procedure updateCountry (country1 IN varchar2) is 
+	-- 	BEGIN
+	-- 		update TABLE(select lo.country from o_location lo where lo.country = country and lo.city = city and lo.streetName = streetName and lo.streetNo = streetNo) set lo.country = country1;
+	-- 	END;
+	-- member procedure updateCity (city1 IN varchar2) is 
+	-- 	myQuery clob:='update location_t set city = '||city1||' where location_t.compLoc = '|| self.compLoc;
+	-- 	BEGIN
+	-- 		EXECUTE IMMEDIATE myQuery;
+	-- 	END;
+	-- member procedure updateStreetName (streetName1 IN varchar2) is 
+	-- 	myQuery clob:='update location_t set streetName = '||streetName1||' where location_t.compLoc = '|| self.compLoc;
+	-- 	BEGIN
+	-- 		EXECUTE IMMEDIATE myQuery;
+	-- 	END;
+	-- member procedure updateStreetNo (streetNo1 IN number) is 
+	-- 	myQuery clob:='update location_t set streetNo = '||streetNo1||' where location_t.compLoc = '|| self.compLoc;
+	-- 	BEGIN
+	-- 		EXECUTE IMMEDIATE myQuery;
+	-- 	END;
+
+	-- -- delete an entry -- 
+	-- static procedure deleteLoc(loc in location_t) is
+	-- 	myQuery clob:='delete from location_t where location_t.compLoc = '|| loc.compLoc;
+	-- 	BEGIN
+	-- 		EXECUTE IMMEDIATE myQuery;
+	-- 	END;
 END;
 /
 
 
 CREATE OR REPLACE TYPE BODY AGENCY_T AS
-	map member function compAgency(agency IN AGENCY_T) return number is
+
+	member function getAgency return agency_t IS
+		BEGIN
+			return self;
+		END;
+
+	map member function compAgency return number is
 		BEGIN
 			return agencyNo;
 		END;
@@ -315,11 +386,17 @@ END;
 /
 
 CREATE OR REPLACE TYPE BODY employe_t AS
-	order member function compEmp( emp IN employe_t) return number is
+
+	member function getEmploye return employe_t IS
+		BEGIN
+			return self;
+		END;
+
+	order member function compEmp(emp IN employe_t) return number is
 	
 	-- order en fonction du job dans l'entreprise 
-	position1 NUMBER := 0
-	position2 NUMBER := 0
+	position1 NUMBER := 0;
+	position2 NUMBER := 0;
 
 		BEGIN
 			CASE SELF.job
@@ -344,8 +421,8 @@ CREATE OR REPLACE TYPE BODY employe_t AS
 				WHEN 'PDG' THEN position2 := 8;
 			END CASE;
 
-		position1 := position1 || SELF.empNo
-		position2 := position2 || emp.empNo
+		position1 := position1 || SELF.empNo;
+		position2 := position2 || emp.empNo;
 
 		IF position1 = position2 THEN return 0;
 		ELSIF position1 > position2 THEN return 1;
@@ -354,11 +431,13 @@ CREATE OR REPLACE TYPE BODY employe_t AS
 
 		END;
 
+	
+
 END;
 /
 
 CREATE OR REPLACE TYPE BODY CLIENT_T AS
-	map member function compCli( cli IN CLIENT_T) return number is
+	map member function compCli return number is
 		BEGIN
 			-- return sal || numCli;
 			return numCli;
@@ -378,12 +457,12 @@ END;
 CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 	order member function compAccount( account IN ACCOUNT_T ) return number is 
 
-	-- order en fonction du typeAccount puis du numero 
+	-- order en fonction du accountType puis du numero 
 	position1 NUMBER := 0;
 	position2 NUMBER := 0;
 
 		BEGIN
-			CASE SELF.typeAccount
+			CASE SELF.accountType
 				WHEN 'Compte Courant' THEN position1 := 1;
 				WHEN 'Livret A' THEN position1 := 2;
 				WHEN 'Compte Epargne' THEN position1 := 3;
@@ -391,7 +470,7 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 				WHEN 'PEL Pro' THEN position1 := 5;
 			END CASE;
 
-			CASE account.typeAccount
+			CASE account.accountType
 				WHEN 'Compte Courant' THEN position2 := 1;
 				WHEN 'Livret A' THEN position2 := 2;
 				WHEN 'Compte Epargne' THEN position2 := 3;
@@ -399,8 +478,8 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 				WHEN 'PEL Pro' THEN position2 := 5;
 			END CASE;
 
-		position1 := position1 || SELF.accountNo
-		position2 := position2 || account.accountNo
+		position1 := position1 || SELF.accountNo;
+		position2 := position2 || account.accountNo;
 
 		IF position1 = position2 THEN return 0;
 		ELSIF position1 > position2 THEN return 1;

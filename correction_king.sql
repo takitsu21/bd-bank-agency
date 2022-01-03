@@ -473,7 +473,7 @@ update employe_o oe
 set oe.date_emb=to_date('25-12-2020','DD-MM-YYYY')
 where oe.ename='KING' and oe.refDept.dname in ('Recherche', 'Finance',  'RH');
 
-select * frome employe_o;
+select * from employe_o;
 
 rollback;
 
