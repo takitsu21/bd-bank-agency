@@ -161,7 +161,7 @@ create or replace type AGENCY_T AS OBJECT(
     -- getter 
     member function getAgencyNo return number,
     member function getAName return varchar2,
-    -- member function loc return ref location_t,
+	member function getLoc return ref LOCATION_T,
     -- member function Employes return listRefEmploye_t
 
 	-- update
@@ -186,8 +186,8 @@ CREATE OR REPLACE type TRANSACTION_T as OBJECT(
     
     -- getter
     member function getTNum return number,
-    -- member function getIssuer return ref client_t,
-    -- member function getPayee return ref client_t,
+  	member function getIssuer return ref client_t,
+    member function getPayee return ref client_t,
     member function getAmount return number
 );
 /
@@ -210,7 +210,8 @@ CREATE OR REPLACE type ACCOUNT_T AS OBJECT(
     member function getAccountNo return number,
     member function getAccountType return varchar2, 
     member function getBalance return number,
-    member function getBankCeiling return number 
+    member function getBankCeiling return number,
+	member function getAgency return ref AGENCY_T 
     -- member function getStatements return listRefTransaction_t,
     -- member function getRefAgency return REF agency_t
 
@@ -237,9 +238,17 @@ CREATE OR REPLACE TYPE CLIENT_T AS OBJECT(
     member function getJob return varchar2,
     member function getSal return number,
     member function getProject return CLOB,
-    member function getBirthDate return date
+    member function getBirthDate return date,
+	member function getAgency return ref AGENCY_T,
     -- member function getAccounts return listRefAccount_t,
     -- member function getRefAgency return REF AGENCY_T
+
+	-- update 
+	member procedure updateCName (newCName in varchar2),
+	member procedure updatePrenoms (newPrenoms in tabPrenoms_t),
+	member procedure updateJob (newJob in varchar2),
+	member procedure updateSal (newSal in number),
+	member procedure updateProject (newProject in CLOB)
 );
 /
 
@@ -445,10 +454,10 @@ CREATE OR REPLACE TYPE BODY AGENCY_T AS
         begin
             return aName;
         end;
-   -- member function loc return ref location_t is
-     --   begin
-       --     return loc;
-       -- end;
+    member function getLoc return ref LOCATION_T is 
+    BEGIN
+    return self.loc;
+     end;
   ---  member function Employes return listRefEmploye_t is
         ---begin
       --      return listRefEmploye;
@@ -616,14 +625,49 @@ CREATE OR REPLACE TYPE BODY CLIENT_T AS
     BEGIN 
         return birthDate;
     END;
+	member procedure updateCName(newCName in varchar2) is 
+		begin
+			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.cName=newCName;
+			EXCEPTION
+				when OTHERS then
+					raise ;
+		end;
+	member procedure updatePrenoms(newPrenoms in tabPrenoms_t) is 
+		begin
+			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.prenoms=newPrenoms;
+			EXCEPTION
+				when OTHERS then
+					raise ;
+		end;
+	member procedure updateJob(newJob in varchar2) is
+		begin
+			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.job=newJob;
+			EXCEPTION
+				when OTHERS then
+					raise ;
+		end;
+	member procedure updateSal(newSal in number) is
+		begin
+			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.sal=newSal;
+			EXCEPTION
+				when OTHERS then
+					raise ;
+		end;
+	member procedure updateProject(newProject in CLOB) is 
+	begin
+			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.project=newProject;
+			EXCEPTION
+				when OTHERS then
+					raise ;
+		end;
 --    member function getAccounts return listRefAccount_t is
   --  BEGIN 
     --    return accounts;
     --END;
-  --  member function getRefAgency return REF AGENCY_T is
-  --  BEGIN *
-   --     return refAgency;
-  --  END;
+  member function getAgency return REF AGENCY_T is
+   BEGIN 
+      return self.refAgency;
+  END;
 END;
 /
 
@@ -639,14 +683,14 @@ CREATE OR REPLACE TYPE BODY TRANSACTION_T AS
     BEGIN 
         return tNum;
     END;
-    -- member function getIssuer return ref client_t is
-    -- BEGIN 
-    --     return issuer;
-    -- END;
-    -- member function getPayee return ref client_t is
-    -- BEGIN 
-    --     return payee;
-    -- END;
+    member function getIssuer return ref client_t is
+    BEGIN 
+         return self.issuer;
+    END;
+    member function getPayee return ref client_t is
+    BEGIN 
+         return self.payee;
+    END;
     member function getAmount return number is
     BEGIN 
         return amount;
@@ -707,7 +751,11 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
     BEGIN
         return bankCeiling;
     END;
-
+	member function getAgency return ref AGENCY_T IS
+	BEGIN 
+		return self.refAgency;
+	END;
+    
     --member function getStatements return listRefTransaction_t is
     --BEGIN 
     --    return statements;
