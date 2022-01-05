@@ -211,10 +211,8 @@ CREATE OR REPLACE type ACCOUNT_T AS OBJECT(
     member function getAccountType return varchar2, 
     member function getBalance return number,
     member function getBankCeiling return number,
-	member function getAgency return ref AGENCY_T 
-    -- member function getStatements return listRefTransaction_t,
-    -- member function getRefAgency return REF agency_t
-
+	member function getAgency return ref AGENCY_T,
+    member function getStatements return listRefTransaction_t
 );
 /
 CREATE OR REPLACE type listRefAccount_t as table of REF ACCOUNT_T
@@ -240,8 +238,7 @@ CREATE OR REPLACE TYPE CLIENT_T AS OBJECT(
     member function getProject return CLOB,
     member function getBirthDate return date,
 	member function getAgency return ref AGENCY_T,
-    -- member function getAccounts return listRefAccount_t,
-    -- member function getRefAgency return REF AGENCY_T
+    member function getAccounts return listRefAccount_t,
 
 	-- update 
 	member procedure updateCName (newCName in varchar2),
@@ -660,10 +657,12 @@ CREATE OR REPLACE TYPE BODY CLIENT_T AS
 				when OTHERS then
 					raise ;
 		end;
---    member function getAccounts return listRefAccount_t is
-  --  BEGIN 
-    --    return accounts;
-    --END;
+
+	member function getAccounts return listRefAccount_t is
+   	BEGIN 
+    	return listRefAccount;
+    END;
+
   member function getAgency return REF AGENCY_T is
    BEGIN 
       return self.refAgency;
@@ -755,16 +754,12 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 	BEGIN 
 		return self.refAgency;
 	END;
-    
-    --member function getStatements return listRefTransaction_t is
-    --BEGIN 
-    --    return statements;
-    --END;
 
-   -- member function getAgency return refAgency IS
-   -- BEGIN 
-   --     return agency;
-  --  END;
+	
+    member function getStatements return listRefTransaction_t is
+    BEGIN 
+        return statements;
+    END;
     
 END;
 /
