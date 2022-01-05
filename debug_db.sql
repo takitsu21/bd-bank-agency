@@ -26,8 +26,8 @@ Il s’agit définir les types Body et d’implémenter le code des méthodes de
 
 Vous devez aussi proposer le code de test de chacune des méthodes.
 
-2.6	Travail à rendre (04/01/2022)
-Le travail à rendre doit être dans le fichier :
+2.6	Travail à rENDre (04/01/2022)
+Le travail à rENDre doit être dans le fichier :
 Script_Implementation_type_tables_objet_NomProjet_Nom1_Nom2_Nom3_Nom4.sql
 Vous devez y mettre :
 •	Création des types à partir du schéma de types
@@ -162,14 +162,15 @@ create or replace type AGENCY_T AS OBJECT(
     member function getAgencyNo return number,
     member function getAName return varchar2,
 	member function getLoc return ref LOCATION_T,
-    -- member function Employes return listRefEmploye_t
+    member function getEmployes return listRefEmploye_t,
 
 	-- update
 	member procedure updateAName (newAName in varchar2),
-	member procedure updateLoc(newLoc REF location_t)
+	member procedure updateLoc(newLoc REF location_t),
 
-	-- member procedure	addLinkListeEmployes(RefEmp1 REF Employe_t, nomTable IN varchar2),
-	-- member procedure	deleteLinkListeEmployes (RefEmp1 REF Employe_t, nomTable IN varchar2 ),
+	member procedure addLinkListEmploye(refEmpToAdd REF Employe_t),
+	member procedure deleteLinkListEmploye(refEmpToDelete REF Employe_t)
+
 	-- member procedure	updateLinkListeEmployes (RefEmp1 REF Employe_t, 	RefEmp2 REF Employe_t, nomTable IN varchar2)
 );
 /
@@ -212,7 +213,11 @@ CREATE OR REPLACE type ACCOUNT_T AS OBJECT(
     member function getBalance return number,
     member function getBankCeiling return number,
 	member function getAgency return ref AGENCY_T,
-    member function getStatements return listRefTransaction_t
+    member function getStatements return listRefTransaction_t,
+
+	-- update
+	member procedure updateBankCeiling(newCeiling in number),
+	member procedure updateAgency(newAgency in ref agency_t)
 );
 /
 CREATE OR REPLACE type listRefAccount_t as table of REF ACCOUNT_T
@@ -359,66 +364,57 @@ CREATE OR REPLACE TYPE BODY location_t AS
 
 	-- getter --
 	member function	getCountry return varchar2 is 
-		begin
+		BEGIN
 			return country;
-		end;
+		END;
 
 	member function	getCity return varchar2 is 
-		begin
+		BEGIN
 			return city;
-		end;
+		END;
 	member function	getStreetName return varchar2 is 
-		begin
+		BEGIN
 			return streetName;
-		end;
+		END;
 	member function getstreetNo return number is 
-		begin
+		BEGIN
 			return streetNo;
-		end;
+		END;
 	
 	-- -- update LOC --
 	member procedure updateCountry(newCountry IN varchar2) is 
 
-		begin
+		BEGIN
 			update (select * from o_location lo where lo.country=self.country and lo.city=self.city and lo.streetName=self.streetName and lo.streetNo=self.streetNo) ol set ol.country=newCountry;
 
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
-
-		-- BEGIN
-			-- update (select * from o_location lo where lo.country=loc.country and lo.city=loc.city and lo.streetName=loc.streetName and lo.streetNo=loc.streetNo) set country=newCountry;
-			
-		-- 	dbms_output.put_line(country || city || streetName || streetNo);
-			
-        --     dbms_output.put_line('update country to '|| newCountry);
-		-- END;
-    -- update TABLE(select * from o_location lo where lo.country = country and lo.city = city and lo.streetName = streetName and lo.streetNo = streetNo) set lo.country = country1;
+		END;
 	member procedure updateCity (newCity IN varchar2) is 
-		begin
+		BEGIN
 			update (select * from o_location lo where lo.country=self.country and lo.city=self.city and lo.streetName=self.streetName and lo.streetNo=self.streetNo) ol set ol.city=newCity;
 
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updateStreetName (newStreetName IN varchar2) is 
-		begin
+		BEGIN
 			update (select * from o_location lo where lo.country=self.country and lo.city=self.city and lo.streetName=self.streetName and lo.streetNo=self.streetNo) ol set ol.streetName=newStreetName;
 
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updateStreetNo (newStreetNo in number) is
-		begin
+		BEGIN
 			update (select * from o_location lo where lo.country=self.country and lo.city=self.city and lo.streetName=self.streetName and lo.streetNo=self.streetNo) ol set ol.streetNo=newStreetNo;
 
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 
 	-- -- delete an entry -- 
 	-- static procedure deleteLoc(loc in location_t) is
@@ -426,6 +422,8 @@ CREATE OR REPLACE TYPE BODY location_t AS
 	-- 	BEGIN
 	-- 		EXECUTE IMMEDIATE myQuery;
 	-- 	END;
+
+
 END;
 /
 
@@ -444,37 +442,53 @@ CREATE OR REPLACE TYPE BODY AGENCY_T AS
 
     -- getter 
     member function getAgencyNo return number is
-        begin
+        BEGIN
             return agencyNo;
-        end;
+        END;
     member function getAName return varchar2 is
-        begin
+        BEGIN
             return aName;
-        end;
+        END;
     member function getLoc return ref LOCATION_T is 
     BEGIN
     return self.loc;
-     end;
-  ---  member function Employes return listRefEmploye_t is
-        ---begin
-      --      return listRefEmploye;
-    --    end;
+     END;
+   	member function getEmployes return listRefEmploye_t is
+        BEGIN
+           return listRefEmp;
+   END;
 
 	member procedure updateAName(newAName in varchar2) is
-		begin
+		BEGIN
 			update (select * from o_agency oa where oa.agencyNo=self.agencyNo) oaNew set oaNew.aName=newAName;
 
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updateLoc(newLoc REF location_t) is 
-		begin
+		BEGIN
 			update (select * from o_agency oa where oa.agencyNo=self.agencyNo) oaNew set oaNew.loc=newLoc;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
+
+    member procedure addLinkListEmploye(refEmpToAdd REF Employe_t) is
+    BEGIN
+        INSERT INTO TABLE(select oa.listRefEmp from o_agency oa where oa.agencyNo=self.agencyNo) le values(refEmpToAdd);
+        EXCEPTION
+            when OTHERS then
+                raise ;
+	END;
+	member procedure deleteLinkListEmploye(refEmpToDelete REF Employe_t) IS
+	emp employe_t;
+	BEGIN
+		delete FROM TABLE(select oa.listRefEmp from o_agency oa where oa.agencyNo=self.agencyNo) le where le.column_value=refEmpToDelete;
+        EXCEPTION
+            when OTHERS then
+                raise ;
+	END;
 END;
 /
 
@@ -554,44 +568,57 @@ CREATE OR REPLACE TYPE BODY employe_t AS
             return employementDate;
         END;
 	member function getAgency return ref agency_t is 
-		begin
+		BEGIN
 			return self.refAgency;
-		end;
+		END;
 	member procedure updateName(newName in varchar2) is 
-		begin
+		BEGIN
 			update (select * from o_employe oe where oe.empNo=self.empNo) oeNew set oeNew.eName=newName;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updatePrenoms(newPrenoms in tabPrenoms_t) is
-		begin
+		BEGIN
 			update (select * from o_employe oe where oe.empNo=self.empNo) oeNew set oeNew.prenoms=newPrenoms;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updateJob(newJob in varchar2) is
-		begin
+		BEGIN
 			update (select * from o_employe oe where oe.empNo=self.empNo) oeNew set oeNew.job=newJob;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updateSal(newSal in number) is
-		begin
+		BEGIN
 			update (select * from o_employe oe where oe.empNo=self.empNo) oeNew set oeNew.sal=newSal;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updateCV(newCV in CLOB) is
-		begin
+		BEGIN
 			update (select * from o_employe oe where oe.empNo=self.empNo) oeNew set oeNew.cv=newCV;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
+
+
+--	member procedure deleteEmp( emp in employe_t) is 
+--	BEGIN
+--		delete from 
+--		o_employe em where em.empNo=emp.empNo;
+--		EXCEPTION
+--		when OTHERS then
+--			raise;
+--	END;
+
+
+	
 END;
 /
 
@@ -623,40 +650,40 @@ CREATE OR REPLACE TYPE BODY CLIENT_T AS
         return birthDate;
     END;
 	member procedure updateCName(newCName in varchar2) is 
-		begin
+		BEGIN
 			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.cName=newCName;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updatePrenoms(newPrenoms in tabPrenoms_t) is 
-		begin
+		BEGIN
 			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.prenoms=newPrenoms;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updateJob(newJob in varchar2) is
-		begin
+		BEGIN
 			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.job=newJob;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updateSal(newSal in number) is
-		begin
+		BEGIN
 			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.sal=newSal;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 	member procedure updateProject(newProject in CLOB) is 
-	begin
+		BEGIN
 			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.project=newProject;
 			EXCEPTION
 				when OTHERS then
 					raise ;
-		end;
+		END;
 
 	member function getAccounts return listRefAccount_t is
    	BEGIN 
@@ -692,8 +719,9 @@ CREATE OR REPLACE TYPE BODY TRANSACTION_T AS
     END;
     member function getAmount return number is
     BEGIN 
-        return amount;
+        return self.amount;
     END;
+	-- member procedure
 END;
 /
 
@@ -733,27 +761,41 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 
     member function getAccountNo return number IS
     BEGIN
-        return accountNo;
+        return self.accountNo;
     END;
 
     member function getAccountType return varchar2 Is
     BEGIN 
-        return accountType;
+        return self.accountType;
     END;
 
     member function getBalance return number IS
     BEGIN
-        return balance;
+        return self.balance;
     END;
 
     member function getBankCeiling return number IS 
     BEGIN
-        return bankCeiling;
+        return self.bankCeiling;
     END;
 	member function getAgency return ref AGENCY_T IS
 	BEGIN 
 		return self.refAgency;
 	END;
+	member procedure updateBankCeiling(newCeiling in number) is
+		BEGIN
+			update (select * from o_account oa where oa.accountNo=self.accountNo) oaNew set oaNew.bankCeiling=newCeiling;
+			EXCEPTION
+				when OTHERS then
+					raise ;
+		END;
+	member procedure updateAgency(newAgency in ref agency_t) is
+		BEGIN
+			update (select * from o_account oa where oa.accountNo=self.accountNo) oaNew set oaNew.refAgency=newAgency;
+			EXCEPTION
+				when OTHERS then
+					raise ;
+		END;
 
 	
     member function getStatements return listRefTransaction_t is
@@ -916,7 +958,7 @@ declare
 	refAct19 	   REF ACCOUNT_T;
 	refAct20 	   REF ACCOUNT_T;
 
-begin
+BEGIN
 
 -- Insertion des locations des agences --
 
@@ -2229,7 +2271,7 @@ begin
 	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=20) lrt 
 	values(refTransac11);
 
-end;
+END;
 /
 
 commit;
