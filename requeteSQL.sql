@@ -137,6 +137,82 @@ begin
 end;
 /
 
+-- requète de màj
+
+-- 1 table
+	declare
+	loc location_t;
+	begin
+		select value(lo) into loc from 
+		o_location lo where lo.country='France' and lo.city='Paris' and lo.streetName='Rue de la paix';
+
+		loc.updateStreetName('Place Vendome', loc);
+	end;
+	/
+
+	declare
+	cli client_t;
+	begin
+		select value(oc) into cli from 
+		o_client oc where oc.numCli='7';
+
+		cli.updateJob('Directeur', cli);
+		cli.updateSal(5000, cli)
+	end;
+	/
+-- 2 tables
+DECLARE 
+
+refOe1 ref EMPLOYE_T;
+agency agency_t;
+refAgency ref agency_t;
+agency2 agency_t;
+refAgency2 ref agency_t;
+refOe2 ref employe_t;
+
+emp1 employe_t;
+emp2 employe_t;
+
+begin
+
+	select value(oa), ref(oa) into agency, refAgency
+	from o_agency oa where oa.agencyNo=1;
+    
+    select value(oa), ref(oa) into agency2, refAgency2
+	from o_agency oa where oa.agencyNo=2;
+    
+    select value(oe), ref(oe) into emp1, refOe1
+    from o_employe oe where oe.empNo=1;
+    
+    select value(oe), ref(oe) into emp2, refOe2
+    from o_employe oe where oe.empNo=3;
+    
+    emp1.updateAgency(null);
+    emp2.updateAgency(refAgency);
+    
+	agency.updateLinkListEmploye(refOe1, refOe2);
+    agency2.deleteLinkListEmploye(refOe2);
+    
+
+end;
+/
+
+declare 
+
+acc account_t;
+
+begin
+	select value(lra.column_value) into acc
+	from table(select oc.listRefAccount
+	from o_client oc
+	where oc.numCli=13) lra;
+
+	acc.updateBankCeiling(20000);
+end;
+
+-- >2 tables
+
+
 commit;
 
 

@@ -448,7 +448,7 @@ Nom                                       NULL ?   Type
 -- Chap_1_8.5 Mise à jour des objets
 -- Modifier la localite d'un departement connaissant son nom
 -- Modifier la date d'embauche d'un Employe connaissant son nom sachant
--- qu'il doit travailler dans l’un des departements suivants : 'Recherche',
+-- qu'il doit travailler  l’un des departements suivants : 'Recherche',
 -- 'Finance' ou  ‘RH’
 -- Supprimer un DEPT et mettre la reference vers le departement à null
 -- dans la table employe_o
