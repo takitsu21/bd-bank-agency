@@ -305,13 +305,12 @@ CREATE OR REPLACE TYPE CLIENT_T AS OBJECT(
 	-- update link 
 	member procedure addLinkListAccount(refAccToAdd REF account_t),
 	member procedure deleteLinkListAccount(refAccToDelete REF account_t),
-	member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t)
+	member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t),
 
 	-- Consultation --
-	-- static function getClientStatic (numCli in number) return client_t
-	-- static function getAgencyStatic (numCli in number) return agency_t,
-	-- static function getAccountsStatic (numCli in number) return listRefAccounts_t,
-
+	static function getClientStatic (numCli1 in number) return client_t,
+	static function getAgencyStatic (numCli1 in number) return agency_t,
+	static function getAccountsStatic (numCli1 in number) return listRefAccount_t
 );
 /
 
@@ -330,10 +329,6 @@ ALTER TYPE TRANSACTION_T ADD
 ALTER TYPE TRANSACTION_T ADD
 	static function getPayeeStatic (tNum1 in number) return client_t cascade;
 /
-
---ALTER TYPE CLIENT_T ADD
---		static function getClientStatic (numCli in number) return client_t cascade;
---/
 
 -- TABLES OBJETS --
 
@@ -838,136 +833,143 @@ END;
 
 CREATE OR REPLACE TYPE BODY CLIENT_T AS
 	map member function compCli return number is
-		BEGIN
-			-- return sal || numCli;
-			return numCli;
-		END;
+	BEGIN
+		-- return sal || numCli;
+		return numCli;
+	END;
 
     member function getCName return varchar2 is 
     BEGIN 
         return cName;
     END;
+
     member function getJob return varchar2 is
     BEGIN 
         return job;
     END;
+
     member function getSal return number is
     BEGIN 
         return sal;
     END;
+
     member function getProject return CLOB is
     BEGIN 
         return project;
     END;
+
     member function getBirthDate return date is
     BEGIN 
         return birthDate;
     END;
+
 	member procedure updateCName(newCName in varchar2) is 
-		BEGIN
-			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.cName=newCName;
-			EXCEPTION
-				when OTHERS then
-					raise ;
-		END;
+	BEGIN
+		update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.cName=newCName;
+		EXCEPTION
+			when OTHERS then
+				raise ;
+	END;
+
 	member procedure updatePrenoms(newPrenoms in tabPrenoms_t) is 
-		BEGIN
-			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.prenoms=newPrenoms;
-			EXCEPTION
-				when OTHERS then
-					raise ;
-		END;
+	BEGIN
+		update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.prenoms=newPrenoms;
+		EXCEPTION
+			when OTHERS then
+				raise ;
+	END;
+
 	member procedure updateJob(newJob in varchar2) is
-		BEGIN
-			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.job=newJob;
-			EXCEPTION
-				when OTHERS then
-					raise ;
-		END;
+	BEGIN
+		update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.job=newJob;
+		EXCEPTION
+			when OTHERS then
+				raise ;
+	END;
+
 	member procedure updateSal(newSal in number) is
-		BEGIN
-			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.sal=newSal;
-			EXCEPTION
-				when OTHERS then
-					raise ;
-		END;
+	BEGIN
+		update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.sal=newSal;
+		EXCEPTION
+			when OTHERS then
+				raise ;
+	END;
+
 	member procedure updateProject(newProject in CLOB) is 
-		BEGIN
-			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.project=newProject;
-			EXCEPTION
-				when OTHERS then
-					raise ;
-		END;
+	BEGIN
+		update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.project=newProject;
+		EXCEPTION
+			when OTHERS then
+				raise ;
+	END;
 
 	member function getAccounts return listRefAccount_t is
    	BEGIN 
     	return listRefAccount;
     END;
 
-  member function getAgency return REF AGENCY_T is
-   BEGIN 
-      return self.refAgency;
-  END;
+	member function getAgency return REF AGENCY_T is
+	BEGIN 
+		return self.refAgency;
+	END;
 
-member procedure addLinkListAccount(refAccToAdd REF account_t) IS 
-BEGIN
-  INSERT INTO TABLE(select oc.listRefAccount from o_client oc where oc.numCli=self.numCli) le values(refAccToAdd);
-        EXCEPTION
-            when OTHERS then
-                raise ;
-END;
+	member procedure addLinkListAccount(refAccToAdd REF account_t) IS 
+	BEGIN
+	INSERT INTO TABLE(select oc.listRefAccount from o_client oc where oc.numCli=self.numCli) le values(refAccToAdd);
+			EXCEPTION
+				when OTHERS then
+					raise ;
+	END;
 
-member procedure deleteLinkListAccount(refAccToDelete REF account_t) IS 
-BEGIN
-	delete FROM TABLE(select  oc.listRefAccount from o_client oc  where oc.numCli=self.numCli) le where le.column_value=refAccToDelete;
-	EXCEPTION
-		when OTHERS then
-			raise ;
-
-END;
-
-member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t) IS 
-BEGIN
-
-		UPDATE TABLE(select oc.listRefAccount from o_client oc where oc.numCli=self.numCli) le
-		set le.column_value=newRefAcc
-		where le.column_value=refAccToModify;
-	
+	member procedure deleteLinkListAccount(refAccToDelete REF account_t) IS 
+	BEGIN
+		delete FROM TABLE(select  oc.listRefAccount from o_client oc  where oc.numCli=self.numCli) le where le.column_value=refAccToDelete;
 		EXCEPTION
 			when OTHERS then
-				raise;
-END;
+				raise ;
+
+	END;
+
+	member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t) IS 
+	BEGIN
+
+			UPDATE TABLE(select oc.listRefAccount from o_client oc where oc.numCli=self.numCli) le
+			set le.column_value=newRefAcc
+			where le.column_value=refAccToModify;
+		
+			EXCEPTION
+				when OTHERS then
+					raise;
+	END;
 
 
---static function getClientStatic (numCli1 in number) return client_t IS
---client1 client_t:=null;
---BEGIN
---	select value(cli) into client1 
---	from o_client cli where cli.numCli=numCli1;
---	return client1;
---	exception when no_data_found then raise no_data_found;
---END;
+	static function getClientStatic (numCli1 in number) return client_t IS
+	client1 client_t:=null;
+	BEGIN
+		select value(cli) into client1 
+		from o_client cli where cli.numCli=numCli1;
+		return client1;
+		exception when no_data_found then raise no_data_found;
+		END;
 
-	-- static function getAgencyStatic (numCli1 in number) return agency_t IS
-	-- agency1 agency_t:=null;
-	-- BEGIN 
-		-- select deref(cli.refAgency) into agency1
-		-- from o_client cli where cli.numCLi=numCli1;
-		-- return agency1;
-		-- exception when no_data_found then raise no_data_found;
-	--END;
+	static function getAgencyStatic (numCli1 in number) return agency_t IS
+	agency1 agency_t:=null;
+	BEGIN 
+		select deref(value(cli).refAgency) into agency1
+		from o_client cli where cli.numCLi=numCli1;
+		return agency1;
+		exception when no_data_found then raise no_data_found;
+	END;
 	
-	-- static function getAccountsStatic (numCli1 in number) return listRefAccounts_t IS
-	-- listAccounts1 listRefAccounts:=null;
-	-- BEGIN
-		-- select CAST( COLLECT (deref(le.column_value)) AS listRefAcounts_t) INTO listAccounts1
-		-- from table( select cli.listRefAccount from o_client cli where cli.numCli=numCli1) le;
-		-- return listAccounts;
-		-- exception when no_data_found then raise no_data_found;
-	-- END;
+	static function getAccountsStatic (numCli1 in number) return listRefAccount_t IS
+	listAccounts1 listRefAccount_t:=null;
+	BEGIN
+		select CAST( COLLECT (deref(le.column_value)) AS listRefAccount_t) INTO listAccounts1
+		from table( select cli.listRefAccount from o_client cli where cli.numCli=numCli1) le;
+		return listAccounts1;
+		exception when no_data_found then raise no_data_found;
+	END;
 	
-
-
 
 END;
 /
