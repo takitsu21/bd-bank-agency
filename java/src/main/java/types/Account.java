@@ -9,15 +9,7 @@ public class Account implements SQLData {
     private float balance;
     private float bankceiling;
     private Array statements;
-    private Agency refAgency;
-
-    public String getSqlType() {
-        return sqlType;
-    }
-
-    public void setSqlType(String sqlType) {
-        this.sqlType = sqlType;
-    }
+    private Ref refAgency;
 
     public int getAccountNo() {
         return accountNo;
@@ -59,11 +51,11 @@ public class Account implements SQLData {
         this.statements = statements;
     }
 
-    public Agency getRefAgency() {
+    public Ref getRefAgency() {
         return refAgency;
     }
 
-    public void setRefAgency(Agency refAgency) {
+    public void setRefAgency(Ref refAgency) {
         this.refAgency = refAgency;
     }
 
@@ -80,11 +72,16 @@ public class Account implements SQLData {
         this.balance = stream.readFloat();
         this.bankceiling = stream.readFloat();
         this.statements = stream.readArray();
-        this.refAgency = (Agency) stream.readObject();
+        this.refAgency = stream.readRef();
     }
 
     @Override
     public void writeSQL(SQLOutput stream) throws SQLException {
-
+        stream.writeInt(accountNo);
+        stream.writeString(accountType);
+        stream.writeFloat(balance);
+        stream.writeFloat(bankceiling);
+        stream.writeArray(statements);
+        stream.writeRef(refAgency);
     }
 }

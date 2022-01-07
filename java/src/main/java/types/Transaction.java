@@ -1,36 +1,28 @@
 package types;
 
-import java.sql.SQLData;
-import java.sql.SQLException;
-import java.sql.SQLInput;
-import java.sql.SQLOutput;
+import java.sql.*;
 
 public class Transaction implements SQLData {
-    private String sql_type;
+    private String sqlType;
     private int tNum;
-    private Client issuer;
-    private Client payee;
+    private Ref issuer;
+    private Ref refAccIssuer;
+    private Ref payee;
+    private Ref refAccPayee;
     private float amount;
 
 
     public Transaction() {
     }
 
-    public Transaction(String sql_type, int tNum, Client issuer, Client payee, float amount) {
-        this.sql_type = sql_type;
+    public Transaction(String sqlType, int tNum, Ref issuer, Ref refAccIssuer, Ref payee, Ref refAccPayee, float amount) {
+        this.sqlType = sqlType;
         this.tNum = tNum;
         this.issuer = issuer;
+        this.refAccIssuer = refAccIssuer;
         this.payee = payee;
+        this.refAccPayee = refAccPayee;
         this.amount = amount;
-    }
-
-
-    public String getSql_type() {
-        return sql_type;
-    }
-
-    public void setSql_type(String sql_type) {
-        this.sql_type = sql_type;
     }
 
     public int gettNum() {
@@ -41,20 +33,36 @@ public class Transaction implements SQLData {
         this.tNum = tNum;
     }
 
-    public Client getIssuer() {
+    public Ref getIssuer() {
         return issuer;
     }
 
-    public void setIssuer(Client issuer) {
+    public void setIssuer(Ref issuer) {
         this.issuer = issuer;
     }
 
-    public Client getPayee() {
+    public Ref getRefAccIssuer() {
+        return refAccIssuer;
+    }
+
+    public void setRefAccIssuer(Ref refAccIssuer) {
+        this.refAccIssuer = refAccIssuer;
+    }
+
+    public Ref getPayee() {
         return payee;
     }
 
-    public void setPayee(Client payee) {
+    public void setPayee(Ref payee) {
         this.payee = payee;
+    }
+
+    public Ref getRefAccPayee() {
+        return refAccPayee;
+    }
+
+    public void setRefAccPayee(Ref refAccPayee) {
+        this.refAccPayee = refAccPayee;
     }
 
     public float getAmount() {
@@ -67,14 +75,16 @@ public class Transaction implements SQLData {
 
     @Override
     public String getSQLTypeName() throws SQLException {
-        return null;
+        return sqlType;
     }
 
     public void readSQL(SQLInput stream, String typeName) throws SQLException {
-        sql_type = typeName;
+        sqlType = typeName;
         tNum = stream.readInt();
-        issuer = (Client) stream.readObject();
-        payee = (Client) stream.readObject();
+        issuer = stream.readRef();
+        refAccIssuer = stream.readRef();
+        payee = stream.readRef();
+        refAccPayee = stream.readRef();
         amount = stream.readFloat();
     }
 
@@ -83,11 +93,23 @@ public class Transaction implements SQLData {
     */
     public void writeSQL(SQLOutput stream) throws SQLException {
         stream.writeInt(tNum);
-        stream.writeObject((SQLData) issuer);
-        stream.writeObject((SQLData) payee);
+        stream.writeRef(issuer);
+        stream.writeRef(refAccIssuer);
+        stream.writeRef(payee);
+        stream.writeRef(refAccPayee);
         stream.writeFloat(amount);
-
     }
 
-
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "sqlType='" + sqlType + '\'' +
+                ", tNum=" + tNum +
+                ", issuer=" + issuer +
+                ", refAccIssuer=" + refAccIssuer +
+                ", payee=" + payee +
+                ", refAccPayee=" + refAccPayee +
+                ", amount=" + amount +
+                '}';
+    }
 }
