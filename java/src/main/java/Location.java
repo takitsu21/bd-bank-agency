@@ -66,7 +66,7 @@ public class Location implements SQLData {
      */
     @Override
     public String getSQLTypeName() throws SQLException {
-        return "LOCATION_T";
+        return sqlType;
     }
 
     /**
