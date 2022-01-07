@@ -1,3 +1,5 @@
+package types;
+
 import java.sql.SQLData;
 import java.sql.*;
 public class Account implements SQLData {

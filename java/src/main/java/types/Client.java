@@ -1,30 +1,35 @@
+package types;
+
+import java.io.BufferedReader;
 import java.sql.*;
 
-public class Employe implements SQLData {
+public class Client implements SQLData {
     private String sqlType;
-    private int empNo;
-    private String eName;
+    private int numCli;
+    private String cName;
     private Array prenoms;
     private String job;
     private float sal;
-    private Clob cv;
+    private Array listRefAccount;
+    private Clob project;
     private Date birthDate;
-    private Date employementDate;
     private Ref refAgency;
 
-    public Employe() {
+
+    public Client() {
+
     }
 
-    public Employe(String sqlType, int empNo, String eName, Array prenoms, String job, float sal, Clob cv, Date birthDate, Date employementDate, Ref refAgency) {
+    public Client(String sqlType, int numCli, String cName, Array prenoms, String job, float sal, Array listRefAccount, Clob project, Date birthDate, Ref refAgency) {
         this.sqlType = sqlType;
-        this.empNo = empNo;
-        this.eName = eName;
+        this.numCli = numCli;
+        this.cName = cName;
         this.prenoms = prenoms;
         this.job = job;
         this.sal = sal;
-        this.cv = cv;
+        this.listRefAccount = listRefAccount;
+        this.project = project;
         this.birthDate = birthDate;
-        this.employementDate = employementDate;
         this.refAgency = refAgency;
     }
 
@@ -36,20 +41,20 @@ public class Employe implements SQLData {
         this.sqlType = sqlType;
     }
 
-    public int getEmpNo() {
-        return empNo;
+    public int getNumCli() {
+        return numCli;
     }
 
-    public void setEmpNo(int empNo) {
-        this.empNo = empNo;
+    public void setNumCli(int numCli) {
+        this.numCli = numCli;
     }
 
-    public String geteName() {
-        return eName;
+    public String getcName() {
+        return cName;
     }
 
-    public void seteName(String eName) {
-        this.eName = eName;
+    public void setcName(String cName) {
+        this.cName = cName;
     }
 
     public Array getPrenoms() {
@@ -76,12 +81,20 @@ public class Employe implements SQLData {
         this.sal = sal;
     }
 
-    public Clob getCv() {
-        return cv;
+    public Array getListRefAccount() {
+        return listRefAccount;
     }
 
-    public void setCv(Clob cv) {
-        this.cv = cv;
+    public void setListRefAccount(Array listRefAccount) {
+        this.listRefAccount = listRefAccount;
+    }
+
+    public Clob getProject() {
+        return project;
+    }
+
+    public void setProject(Clob project) {
+        this.project = project;
     }
 
     public Date getBirthDate() {
@@ -90,14 +103,6 @@ public class Employe implements SQLData {
 
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
-    }
-
-    public Date getEmployementDate() {
-        return employementDate;
-    }
-
-    public void setEmployementDate(Date employementDate) {
-        this.employementDate = employementDate;
     }
 
     public Ref getRefAgency() {
@@ -161,48 +166,61 @@ public class Employe implements SQLData {
     @Override
     public void readSQL(SQLInput stream, String typeName) throws SQLException {
         this.sqlType = typeName;
-        this.empNo = stream.readInt();
-        this.eName = stream.readString();
+        this.numCli = stream.readInt();
+        this.cName = stream.readString();
         this.prenoms = stream.readArray();
         this.job = stream.readString();
         this.sal = stream.readFloat();
-        this.cv = stream.readClob();
+        this.listRefAccount = stream.readArray();
+        this.project = stream.readClob();
         this.birthDate = stream.readDate();
-        this.employementDate = stream.readDate();
         this.refAgency = stream.readRef();
     }
 
-
-    /*
-        Ecrire dans le flot dans l'ordre.
-    */
+    /**
+     * Writes this object to the given SQL data stream, converting it back to
+     * its SQL value in the data source.
+     * The implementation of the method must follow this protocol:<BR>
+     * It must write each of the attributes of the SQL type
+     * to the given output stream.  This is done by calling a
+     * method of the output stream to write each item, in the order that
+     * they appear in the SQL definition of the type.
+     * Specifically, it must call the appropriate {@code SQLOutput} writer
+     * method(s) ({@code writeInt}, {@code writeString}, and so on)
+     * to do the following: for a Distinct Type, write its single data element;
+     * for a Structured Type, write a value for each attribute of the SQL type.
+     *
+     * @param stream the {@code SQLOutput} object to which to write the data for
+     *               the value that was custom mapped
+     * @throws SQLException                    if there is a database access error
+     * @throws SQLFeatureNotSupportedException if the JDBC driver does not support
+     *                                         this method
+     * @see SQLOutput
+     * @since 1.2
+     */
+    @Override
     public void writeSQL(SQLOutput stream) throws SQLException {
-        stream.writeInt(empNo);
-        stream.writeString(eName);
+        stream.writeInt(numCli);
+        stream.writeString(cName);
         stream.writeArray(prenoms);
         stream.writeString(job);
         stream.writeFloat(sal);
-        stream.writeClob(cv);
+        stream.writeArray(listRefAccount);
+        stream.writeClob(project);
         stream.writeDate(birthDate);
-        stream.writeDate(employementDate);
         stream.writeRef(refAgency);
-
     }
 
-
-    @Override
-    public String toString() {
-        return "Employe{" +
-                "sqlType='" + sqlType + '\'' +
-                ", empNo=" + empNo +
-                ", eName='" + eName + '\'' +
-                ", prenoms=" + prenoms +
-                ", job='" + job + '\'' +
-                ", sal=" + sal +
-                ", cv=" + cv +
-                ", birthDate=" + birthDate +
-                ", employementDate=" + employementDate +
-                ", refAgency=" + refAgency +
-                '}';
+    public void displayClientProject() throws java.sql.SQLException, java.io.IOException {
+        BufferedReader clobReader;
+        clobReader = new BufferedReader(this.getProject().getCharacterStream());
+        String ligne;
+        System.out.println("");
+        System.out.println("[ <PROJECT/ ");
+        while ((ligne = clobReader.readLine()) != null) {
+            System.out.println("   " + ligne);
+        }
+        System.out.println(" /CV>] ");
+        System.out.println("");
     }
 }
