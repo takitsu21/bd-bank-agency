@@ -53,7 +53,7 @@ public class Agency implements SQLData {
 
     @Override
     public String getSQLTypeName() throws SQLException {
-        return "AGENCY_T";
+        return sqlType;
     }
 
     @Override
