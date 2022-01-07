@@ -1,5 +1,3 @@
-import oracle.sql.ARRAY;
-
 import java.sql.*;
 
 public class Transaction implements SQLData {
