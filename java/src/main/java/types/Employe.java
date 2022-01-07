@@ -192,14 +192,14 @@ public class Employe implements SQLData {
 
     }
 
-    public void displayCV() throws java.sql.SQLException, java.io.IOException{
+    public void displayCV() throws java.sql.SQLException, java.io.IOException {
         BufferedReader clobReader;
         clobReader = new BufferedReader(this.getCv().getCharacterStream());
         String ligne;
         System.out.println("");
         System.out.println("[ <CV/ ");
-        while((ligne = clobReader.readLine()) != null){
-            System.out.println("   "+ligne);
+        while ((ligne = clobReader.readLine()) != null) {
+            System.out.println("   " + ligne);
         }
         System.out.println(" /CV>] ");
         System.out.println("");

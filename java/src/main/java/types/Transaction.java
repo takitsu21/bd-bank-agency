@@ -1,16 +1,20 @@
 package types;
 
-import java.sql.*;
+import java.sql.SQLData;
+import java.sql.SQLException;
+import java.sql.SQLInput;
+import java.sql.SQLOutput;
 
 public class Transaction implements SQLData {
-    private String sql_type ;
+    private String sql_type;
     private int tNum;
     private Client issuer;
-    private Client payee ;
-    private float amount ;
+    private Client payee;
+    private float amount;
 
 
-    public Transaction (){}
+    public Transaction() {
+    }
 
     public Transaction(String sql_type, int tNum, Client issuer, Client payee, float amount) {
         this.sql_type = sql_type;
@@ -66,8 +70,8 @@ public class Transaction implements SQLData {
         return null;
     }
 
-    public void readSQL(SQLInput stream, String typeName) throws SQLException{
-        sql_type=typeName;
+    public void readSQL(SQLInput stream, String typeName) throws SQLException {
+        sql_type = typeName;
         tNum = stream.readInt();
         issuer = (Client) stream.readObject();
         payee = (Client) stream.readObject();
@@ -77,7 +81,7 @@ public class Transaction implements SQLData {
     /*
         Ecrire dans le flot dans l'ordre.
     */
-    public void writeSQL(SQLOutput stream) throws SQLException{
+    public void writeSQL(SQLOutput stream) throws SQLException {
         stream.writeInt(tNum);
         stream.writeObject((SQLData) issuer);
         stream.writeObject((SQLData) payee);

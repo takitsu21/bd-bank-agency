@@ -1,7 +1,7 @@
 package types;
 
-import java.sql.SQLData;
 import java.sql.*;
+
 public class Account implements SQLData {
     private String sqlType;
     private int accountNo;
@@ -76,7 +76,7 @@ public class Account implements SQLData {
     public void readSQL(SQLInput stream, String typeName) throws SQLException {
         this.sqlType = typeName;
         this.accountNo = stream.readInt();
-        this.accountType  = stream.readString();
+        this.accountType = stream.readString();
         this.balance = stream.readFloat();
         this.bankceiling = stream.readFloat();
         this.statements = stream.readArray();

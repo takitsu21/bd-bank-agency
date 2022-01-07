@@ -51,8 +51,6 @@ public class Agency implements SQLData {
     }
 
 
-
-
     @Override
     public String getSQLTypeName() throws SQLException {
         return sqlType;
@@ -70,10 +68,10 @@ public class Agency implements SQLData {
 
     @Override
     public void writeSQL(SQLOutput stream) throws SQLException {
-    stream.writeInt(agencyNo);
-    stream.writeString(aName);
-    stream.writeObject(loc);
-    stream.writeArray(listRefEmp);
+        stream.writeInt(agencyNo);
+        stream.writeString(aName);
+        stream.writeObject(loc);
+        stream.writeArray(listRefEmp);
 
     }
 
