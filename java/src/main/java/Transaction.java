@@ -1,133 +1,89 @@
 import oracle.sql.ARRAY;
 
-import java.sql.Array;
-import java.sql.SQLData;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class Transaction implements SQLData {
     private String sql_type ;
-    private int deptno;
-    private String dname;
-    private String loc;
-    private Array listRefEmp;
+    private int tNum;
+    private Client issuer;
+    private Client payee ;
+    private float amount ;
+
 
     public Transaction (){}
 
-    public Transaction(String sql_type, int deptno,String dname, String loc, ARRAY listRefEmp ){
-        this.sql_type=sql_type;
-        this.deptno=deptno ;
-        this.dname=dname;
-        this.loc=loc;
-        this.listRefEmp=listRefEmp;
+    public Transaction(String sql_type, int tNum, Client issuer, Client payee, float amount) {
+        this.sql_type = sql_type;
+        this.tNum = tNum;
+        this.issuer = issuer;
+        this.payee = payee;
+        this.amount = amount;
     }
 
 
-    /**
-     * @return the deptno
-     */
-    public int getDeptno() {
-        return deptno;
-    }
-
-    /**
-     * @param deptno the deptno to set
-     */
-    public void setDeptno(int deptno) {
-        this.deptno = deptno;
-    }
-
-    /**
-     * @return the dname
-     */
-    public String getDname() {
-        return dname;
-    }
-
-    /**
-     * @param dname the dname to set
-     */
-    public void setDname(String dname) {
-        this.dname = dname;
-    }
-
-    /**
-     * @return the loc
-     */
-    public String getLoc() {
-        return loc;
-    }
-
-    /**
-     * @param loc the loc to set
-     */
-    public void setLoc(String loc) {
-        this.loc = loc;
-    }
-
-    /**
-     * @return the ListRefEmp
-     */
-    public ARRAY getListRefEmp() {
-        return listRefEmp;
-    }
-
-    /**
-     * @param ListRefEmp the loc to set
-     */
-    public void setListRefEmp(ARRAY listRefEmp) {
-        this.listRefEmp = listRefEmp;
-    }
-
-
-    public String getSQLTypeName()throws SQLException {
+    public String getSql_type() {
         return sql_type;
     }
 
-    /**
-     Lire dans le flot dans l'ordre.
+    public void setSql_type(String sql_type) {
+        this.sql_type = sql_type;
+    }
 
-     */
+    public int gettNum() {
+        return tNum;
+    }
+
+    public void settNum(int tNum) {
+        this.tNum = tNum;
+    }
+
+    public Client getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(Client issuer) {
+        this.issuer = issuer;
+    }
+
+    public Client getPayee() {
+        return payee;
+    }
+
+    public void setPayee(Client payee) {
+        this.payee = payee;
+    }
+
+    public float getAmount() {
+        return amount;
+    }
+
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
+
+    @Override
+    public String getSQLTypeName() throws SQLException {
+        return null;
+    }
+
     public void readSQL(SQLInput stream, String typeName) throws SQLException{
         sql_type=typeName;
-        deptno=stream.readInt();
-        dname=stream.readString();
-        loc=stream.readString();
-        listRefEmp=(ARRAY) stream.readArray();
+        tNum = stream.readInt();
+        issuer = (Client) stream.readObject();
+        payee = (Client) stream.readObject();
+        amount = stream.readFloat();
     }
 
     /*
         Ecrire dans le flot dans l'ordre.
     */
     public void writeSQL(SQLOutput stream) throws SQLException{
-        stream.writeInt(deptno);
-        stream.writeString(dname);
-        stream.writeString(loc);
-        stream.writeArray(listRefEmp);
+        stream.writeInt(tNum);
+        stream.writeObject((SQLData) issuer);
+        stream.writeObject((SQLData) payee);
+        stream.writeFloat(amount);
 
     }
 
-    public void display() throws SQLException{
-        System.out.println("");
-        System.out.println("{");
-        System.out.println("deptno = "+this.getDeptno());
-        System.out.println("dname = "+this.getDname());
-        System.out.println("loc = "+this.getLoc());
-        this.displayInfoEmployesDept();
-        System.out.println("}");
-        System.out.println("");
 
-
-    }
-    public void displayInfoEmployesDept() throws SQLException{
-        // affichage des prénoms
-        Ref [] lesRefDesEmployes= (Ref[])this.getListRefEmp().getArray();
-        //System.out.println("Prenoms = "+this.getPrenoms().stringValue());
-        System.out.println("<Employes:");
-        for (Ref lesRefDesEmploye : lesRefDesEmployes) {
-            Employe emp1 = (Employe) lesRefDesEmploye.getObject();
-            System.out.println("   [empno="+emp1.getEmpno()+" ename="+emp1.getEname()+"]");
-
-        }
-        System.out.println(">");
-    }
 }
