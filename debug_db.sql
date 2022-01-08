@@ -84,23 +84,23 @@ create or replace type LOCATION_T AS OBJECT(
 
 	map member function compLoc return varchar2,
 	member function getLoc return location_t,
-	
+
 	-- getter --
 	member function	getCountry return varchar2,
 	member function	getCity return varchar2,
 	member function	getStreetName return varchar2,
 	member function	getstreetNo return number,
-	
+
 	-- update LOC --
 	member procedure updateCountry(newCountry IN varchar2),
 	member procedure updateCity (newCity in varchar2),
 	member procedure updateStreetName (newStreetName IN varchar2),
 	member procedure updateStreetNo (newStreetNo IN number),
 
-	-- delete an entry -- 
+	-- delete an entry --
 	member procedure deleteLoc,
 
-	-- consultation -- 
+	-- consultation --
 	static function getLocStatic (country1 in varchar2, city1 in varchar2, streetName1 in varchar2, streetNo1 in number) return location_t,
 	static function getCountryStatic (city1 in varchar2, streetName1 in varchar2, streetNo1 in number) return varchar2
 
@@ -126,25 +126,25 @@ CREATE OR REPLACE TYPE EMPLOYE_T AS OBJECT(
 	member function getEmploye return employe_t,
 
 	-- getter
-	member function getEmpNo return number, 
+	member function getEmpNo return number,
 	member function getEName return varchar2,
 	member function getJob return varchar2,
-	member function getSal return number, 
+	member function getSal return number,
 	member function getCV return CLOB,
 	member function getBirthDate return date,
 	member function getEmployementDate return date,
 	member function getAgency return ref agency_t,
-	
-	-- update 
+
+	-- update
 	member procedure updateName (newName IN varchar2),
 	member procedure updatePrenoms (newPrenoms in tabPrenoms_t),
 	member procedure updateJob (newJob IN varchar2),
 	member procedure updateSal (newSal IN number),
 	member procedure updateCV (newCV IN CLOB),
-	member procedure updateAgency (newAgency ref agency_t), 
+	member procedure updateAgency (newAgency ref agency_t),
 
-	-- delete an entry
-	-- static function deleteEmp( emp in employe_t)
+	-- delete
+	member procedure deleteEmp,
 	-- member procedure addPrenom (prenom REF tabPrenoms_t),
 	-- member procedure deletePrenom (prenom REF tabPrenoms_t),
 
@@ -173,8 +173,8 @@ create or replace type AGENCY_T AS OBJECT(
 	map member function compAgency return number,
 
 
-	
-    -- getter 
+
+    -- getter
     member function getAgencyNo return number,
     member function getAName return varchar2,
 	member function getLoc return ref LOCATION_T,
@@ -217,7 +217,7 @@ CREATE OR REPLACE type TRANSACTION_T as OBJECT(
     amount         number(11, 4),
 
 	map member function compTransaction return number,
-    
+
     -- getter
     member function getTNum return number,
   	member function getIssuer return ref client_t,
@@ -225,7 +225,7 @@ CREATE OR REPLACE type TRANSACTION_T as OBJECT(
     member function getAmount return number,
 	member function getRefAccIssuer return ref account_t,
 	member function getRefAccPayee return ref account_t,
-	
+
 	-- consultation --
 	static function getTransactionStatic (tNum1 in number) return transaction_t
 	-- static function getIssuerStatic (tNum1 in number) return client_t,
@@ -247,10 +247,10 @@ CREATE OR REPLACE type ACCOUNT_T AS OBJECT(
     refAgency           REF AGENCY_T,
 
 	order member function compAccount( account IN ACCOUNT_T ) return number,
-    
+
     -- getter
     member function getAccountNo return number,
-    member function getAccountType return varchar2, 
+    member function getAccountType return varchar2,
     member function getBalance return number,
     member function getBankCeiling return number,
 	member function getAgency return ref AGENCY_T,
@@ -261,7 +261,7 @@ CREATE OR REPLACE type ACCOUNT_T AS OBJECT(
 	member procedure updateAgency(newAgency in ref agency_t),
 
 	-- delete
-	
+
 
 	member procedure addLinkListTransaction(refTransactionToAdd REF transaction_t),
 	member procedure deleteLinkListTransaction(refTransactionToDelete REF transaction_t),
@@ -290,7 +290,7 @@ CREATE OR REPLACE TYPE CLIENT_T AS OBJECT(
 
 
 	map member function compCli return number,
-    
+
     member function getCName return varchar2,
 	member function getNumCli return number,
     member function getJob return varchar2,
@@ -300,14 +300,14 @@ CREATE OR REPLACE TYPE CLIENT_T AS OBJECT(
 	member function getAgency return ref AGENCY_T,
     member function getAccounts return listRefAccount_t,
 
-	-- update 
+	-- update
 	member procedure updateCName (newCName in varchar2),
 	member procedure updatePrenoms (newPrenoms in tabPrenoms_t),
 	member procedure updateJob (newJob in varchar2),
 	member procedure updateSal (newSal in number),
 	member procedure updateProject (newProject in CLOB),
 
-	-- update link 
+	-- update link
 	member procedure addLinkListAccount(refAccToAdd REF account_t),
 	member procedure deleteLinkListAccount(refAccToDelete REF account_t),
 	member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t),
@@ -318,7 +318,7 @@ CREATE OR REPLACE TYPE CLIENT_T AS OBJECT(
 	static function getAccountsStatic (numCli1 in number) return listRefAccount_t,
 
 	--supression
-	member procedure deleteClient 
+	member procedure deleteClient
 
 );
 /
@@ -329,7 +329,7 @@ ALTER TYPE ACCOUNT_T ADD
 
 ALTER TYPE EMPLOYE_T ADD
     static function getAgencyStatic(empNo1 in number) return agency_t cascade;
-/  
+/
 
 ALTER TYPE TRANSACTION_T ADD
 	static function getIssuerStatic (tNum1 in number) return client_t cascade;
@@ -354,7 +354,7 @@ create table O_LOCATION of LOCATION_T(
 /
 
 drop table O_EMPLOYE cascade constraints;
-create table O_EMPLOYE of EMPLOYE_T(    
+create table O_EMPLOYE of EMPLOYE_T(
      	constraint pk_O_EMPLOYE_empNo primary key(empNo),
 		constraint chk_O_EMPLOYE_eName check(eName=upper(eName)),
 		eName constraint nnl_O_EMPLOYE_eName not null,
@@ -444,31 +444,31 @@ CREATE OR REPLACE TYPE BODY location_t AS
 		END;
 
 	map member function compLoc return varchar2 is
-		BEGIN 
+		BEGIN
 			return country||city||streetName||streetNo;
 		END;
 
 	-- getter --
-	member function	getCountry return varchar2 is 
+	member function	getCountry return varchar2 is
 		BEGIN
 			return country;
 		END;
 
-	member function	getCity return varchar2 is 
+	member function	getCity return varchar2 is
 		BEGIN
 			return city;
 		END;
-	member function	getStreetName return varchar2 is 
+	member function	getStreetName return varchar2 is
 		BEGIN
 			return streetName;
 		END;
-	member function getstreetNo return number is 
+	member function getstreetNo return number is
 		BEGIN
 			return streetNo;
 		END;
-	
+
 	-- -- update LOC --
-		member procedure updateCountry(newCountry IN varchar2) is 
+		member procedure updateCountry(newCountry IN varchar2) is
 
 			BEGIN
 				update (select * from o_location lo where lo.country=self.country and lo.city=self.city and lo.streetName=self.streetName and lo.streetNo=self.streetNo) ol set ol.country=newCountry;
@@ -477,7 +477,7 @@ CREATE OR REPLACE TYPE BODY location_t AS
 					when OTHERS then
 						raise ;
 			END;
-		member procedure updateCity (newCity IN varchar2) is 
+		member procedure updateCity (newCity IN varchar2) is
 			BEGIN
 				update (select * from o_location lo where lo.country=self.country and lo.city=self.city and lo.streetName=self.streetName and lo.streetNo=self.streetNo) ol set ol.city=newCity;
 
@@ -485,7 +485,7 @@ CREATE OR REPLACE TYPE BODY location_t AS
 					when OTHERS then
 						raise ;
 			END;
-		member procedure updateStreetName (newStreetName IN varchar2) is 
+		member procedure updateStreetName (newStreetName IN varchar2) is
 			BEGIN
 				update (select * from o_location lo where lo.country=self.country and lo.city=self.city and lo.streetName=self.streetName and lo.streetNo=self.streetNo) ol set ol.streetName=newStreetName;
 
@@ -502,19 +502,19 @@ CREATE OR REPLACE TYPE BODY location_t AS
 						raise ;
 			END;
 
-	-- -- delete an entry -- 
+	-- -- delete an entry --
 		member procedure deleteLoc is
 		BEGIN
-			DELETE FROM o_location ol 
-			WHERE ol.country = self.country 
-				AND ol.city = self.city 
-				AND ol.streetName=self.streetName 
+			DELETE FROM o_location ol
+			WHERE ol.country = self.country
+				AND ol.city = self.city
+				AND ol.streetName=self.streetName
 				AND ol.streetNo=self.streetNo;
 
-			delete from o_agency ag 
-			where ag.getLoc().country = self.country 
-			AND ag.getLoc().city = self.city 
-			AND ag.getLoc().streetName=self.streetName 
+			delete from o_agency ag
+			where ag.getLoc().country = self.country
+			AND ag.getLoc().city = self.city
+			AND ag.getLoc().streetName=self.streetName
 			AND ag.getLoc().streetNo=self.streetNo;
 
 
@@ -526,10 +526,10 @@ CREATE OR REPLACE TYPE BODY location_t AS
 			select value(ol) into location1 from o_location ol
 			where ol.country=country1 and ol.city=city1 and ol.streetName=streetName1 and ol.streetNo=streetNo1;
 			return location1;
-			Exception when NO_DATA_FOUND then raise no_data_found; 
+			Exception when NO_DATA_FOUND then raise no_data_found;
 		END;
 
-		static function getCountryStatic (city1 in varchar2, streetName1 in varchar2, streetNo1 in number) return varchar2 IS 
+		static function getCountryStatic (city1 in varchar2, streetName1 in varchar2, streetNo1 in number) return varchar2 IS
 		location1 location_t:=NULL;
 		BEGIN
 			select value(ol) into location1 from o_location ol
@@ -554,7 +554,7 @@ CREATE OR REPLACE TYPE BODY AGENCY_T AS
 			return agencyNo;
 		END;
 
-    -- getter 
+    -- getter
     member function getAgencyNo return number is
         BEGIN
             return agencyNo;
@@ -563,7 +563,7 @@ CREATE OR REPLACE TYPE BODY AGENCY_T AS
         BEGIN
             return aName;
         END;
-    member function getLoc return ref LOCATION_T is 
+    member function getLoc return ref LOCATION_T is
     BEGIN
     return self.loc;
      END;
@@ -580,7 +580,7 @@ CREATE OR REPLACE TYPE BODY AGENCY_T AS
 				when OTHERS then
 					raise ;
 		END;
-	member procedure updateLoc(newLoc REF location_t) is 
+	member procedure updateLoc(newLoc REF location_t) is
 		BEGIN
 			update (select * from o_agency oa where oa.agencyNo=self.agencyNo) oaNew set oaNew.loc=newLoc;
 			EXCEPTION
@@ -607,11 +607,11 @@ CREATE OR REPLACE TYPE BODY AGENCY_T AS
 
 	member procedure updateLinkListEmploye(refEmpToModify REF Employe_t, newRefEmp REF Employe_t) is
 	BEGIN
-	
+
 		UPDATE TABLE(select ag.listRefEmp from o_agency ag where ag.agencyNo=self.agencyNo) le
 		set le.column_value=newRefEmp
 		where le.column_value=refEmpToModify;
-		
+
 
 		EXCEPTION
 			when OTHERS then
@@ -637,23 +637,23 @@ CREATE OR REPLACE TYPE BODY AGENCY_T AS
 
 	member procedure updateLinkListClient(refCliToModify REF CLIENT_T, newRefCli REF CLIENT_T) is
 	BEGIN
-	
+
 		UPDATE TABLE(select ag.listRefClient from o_agency ag where ag.agencyNo=self.agencyNo) le
 		set le.column_value=newRefCli
 		where le.column_value=refCliToModify;
-		
+
 
 		EXCEPTION
 			when OTHERS then
 				raise;
 	END;
-	
+
 	static function getAgencyStatic (agencyNo1 in number) return agency_t IS
 	agency1 agency_t:=NULL;
 	BEGIN
 		select value(ag) into agency1
 		from o_agency ag where ag.agencyNo=agencyNo1;
-		return agency1; 
+		return agency1;
 		Exception
 		WHEN NO_DATA_FOUND THEN
 			raise no_data_found;
@@ -664,7 +664,7 @@ CREATE OR REPLACE TYPE BODY AGENCY_T AS
 	BEGIN
 		select deref(value(ag).loc) into location1
 		from o_agency ag where ag.agencyNo=agencyNo1;
-		return location1; 
+		return location1;
 		Exception
 		WHEN NO_DATA_FOUND THEN
 			raise no_data_found;
@@ -672,7 +672,7 @@ CREATE OR REPLACE TYPE BODY AGENCY_T AS
 
 	static function getInfoEmpStatic (agencyNo1 IN number) return listRefEmploye_t IS
 		listEmp listRefEmploye_t:=null;
-	BEGIN 
+	BEGIN
 		select CAST( COLLECT (deref(le.column_value)) AS listRefEmploye_t) INTO listEmp
 		FROM TABLE(select ag.listRefEmp from o_agency ag where ag.agencyNo=agencyNo1) le;
 		return listEmp;
@@ -693,8 +693,8 @@ CREATE OR REPLACE TYPE BODY employe_t AS
 		END;
 
 	order member function compEmp(emp IN employe_t) return number is
-	
-	-- order en fonction du job dans l'entreprise 
+
+	-- order en fonction du job dans l'entreprise
 		position1 NUMBER := 0;
 		position2 NUMBER := 0;
 
@@ -727,7 +727,7 @@ CREATE OR REPLACE TYPE BODY employe_t AS
 			IF position1 = position2 THEN return 0;
 			ELSIF position1 > position2 THEN return 1;
 			ELSIF position1 < position2 THEN return -1;
-			END IF;	
+			END IF;
 
 			END;
 
@@ -760,11 +760,11 @@ CREATE OR REPLACE TYPE BODY employe_t AS
 			BEGIN
 				return employementDate;
 			END;
-		member function getAgency return ref agency_t is 
+		member function getAgency return ref agency_t is
 			BEGIN
 				return self.refAgency;
 			END;
-		member procedure updateName(newName in varchar2) is 
+		member procedure updateName(newName in varchar2) is
 			BEGIN
 				update (select * from o_employe oe where oe.empNo=self.empNo) oeNew set oeNew.eName=newName;
 				EXCEPTION
@@ -808,36 +808,40 @@ CREATE OR REPLACE TYPE BODY employe_t AS
 			END;
 
 
-	--static function deleteEmp is
-	--	BEGIN
-	--		DELETE FROM o_employe emp 
-	--		WHERE emp.empNo = self.empNo 
-	--	END;
+	member procedure deleteEmp is
+		empToDelete employe_t;
+		refEmpToDelete ref employe_t;
+		agency agency_t;
+		BEGIN
+			select value(ag) into agency
+			from o_agency ag where ag.agencyNo=deref(self.refAgency).agencyNo;
 
---	member procedure deleteEmp( emp in employe_t) is 
---	BEGIN
---		delete from 
---		o_employe em where em.empNo=emp.empNo;
---		EXCEPTION
---		when OTHERS then
---			raise;
---	END;
+			select ref(emp), value(emp) into refEmpToDelete, empToDelete
+			FROM o_employe emp
+			where emp.empNo=self.empNo;
+
+			agency.deleteLinkListEmploye(refEmpToDelete);
+
+			DELETE FROM o_employe oe
+			WHERE oe.empNo=self.empNo;
+
+		END;
 
     static function getEmployeStatic (empNo1 in number) return employe_t IS
     employe1 employe_t:=NULL;
     BEGIN
         select value(emp) into employe1 from o_employe emp where emp.empNo=empNo1;
         return employe1;
-        EXCEPTION WHEN NO_DATA_FOUND THEN raise no_data_found; 
-    END; 
+        EXCEPTION WHEN NO_DATA_FOUND THEN raise no_data_found;
+    END;
 
     static function getAgencyStatic (empNo1 in number) return agency_t IS
     agency1 agency_t:=NULL;
-    BEGIN 
-        select deref(value(emp).refAgency) INTO agency1 
+    BEGIN
+        select deref(value(emp).refAgency) INTO agency1
         FROM o_employe emp WHERE emp.empNo=empNo1;
         return agency1;
-        EXCEPTION WHEN NO_DATA_FOUND THEN raise no_data_found; 
+        EXCEPTION WHEN NO_DATA_FOUND THEN raise no_data_found;
     END;
 
 END;
@@ -850,8 +854,8 @@ CREATE OR REPLACE TYPE BODY CLIENT_T AS
 			return numCli;
 		END;
 
-    member function getCName return varchar2 is 
-    BEGIN 
+    member function getCName return varchar2 is
+    BEGIN
         return cName;
     END;
 	member function getNumCli return number is
@@ -859,29 +863,29 @@ CREATE OR REPLACE TYPE BODY CLIENT_T AS
 		return numCli;
 	END;
     member function getJob return varchar2 is
-    BEGIN 
+    BEGIN
         return job;
     END;
     member function getSal return number is
-    BEGIN 
+    BEGIN
         return sal;
     END;
     member function getProject return CLOB is
-    BEGIN 
+    BEGIN
         return project;
     END;
     member function getBirthDate return date is
-    BEGIN 
+    BEGIN
         return birthDate;
     END;
-	member procedure updateCName(newCName in varchar2) is 
+	member procedure updateCName(newCName in varchar2) is
 		BEGIN
 			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.cName=newCName;
 			EXCEPTION
 				when OTHERS then
 					raise ;
 		END;
-	member procedure updatePrenoms(newPrenoms in tabPrenoms_t) is 
+	member procedure updatePrenoms(newPrenoms in tabPrenoms_t) is
 		BEGIN
 			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.prenoms=newPrenoms;
 			EXCEPTION
@@ -902,7 +906,7 @@ CREATE OR REPLACE TYPE BODY CLIENT_T AS
 				when OTHERS then
 					raise ;
 		END;
-	member procedure updateProject(newProject in CLOB) is 
+	member procedure updateProject(newProject in CLOB) is
 		BEGIN
 			update (select * from o_client oc where oc.numCli=self.numCli) ocNew set ocNew.project=newProject;
 			EXCEPTION
@@ -911,21 +915,21 @@ CREATE OR REPLACE TYPE BODY CLIENT_T AS
 		END;
 
 	member function getAccounts return listRefAccount_t is
-   	BEGIN 
+   	BEGIN
     	return listRefAccount;
     END;
 
-	member procedure deleteClient is 
-	begin 
-		delete from o_client cli where cli.numCLi=self.numCLi; 
+	member procedure deleteClient is
+	begin
+		delete from o_client cli where cli.numCLi=self.numCLi;
 	end;
 
   member function getAgency return REF AGENCY_T is
-   BEGIN 
+   BEGIN
       return self.refAgency;
   END;
 
-member procedure addLinkListAccount(refAccToAdd REF account_t) IS 
+member procedure addLinkListAccount(refAccToAdd REF account_t) IS
 BEGIN
   INSERT INTO TABLE(select oc.listRefAccount from o_client oc where oc.numCli=self.numCli) le values(refAccToAdd);
         EXCEPTION
@@ -933,7 +937,7 @@ BEGIN
                 raise ;
 END;
 
-member procedure deleteLinkListAccount(refAccToDelete REF account_t) IS 
+member procedure deleteLinkListAccount(refAccToDelete REF account_t) IS
 BEGIN
 	delete FROM TABLE(select  oc.listRefAccount from o_client oc  where oc.numCli=self.numCli) le where le.column_value=refAccToDelete;
 	EXCEPTION
@@ -942,13 +946,13 @@ BEGIN
 
 END;
 
-	member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t) IS 
+	member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t) IS
 	BEGIN
 
 		UPDATE TABLE(select oc.listRefAccount from o_client oc where oc.numCli=self.numCli) le
 		set le.column_value=newRefAcc
 		where le.column_value=refAccToModify;
-	
+
 		EXCEPTION
 			when OTHERS then
 				raise;
@@ -957,7 +961,7 @@ END;
 	static function getClientStatic (numCli1 in number) return client_t IS
 	client1 client_t:=null;
 	BEGIN
-		select value(cli) into client1 
+		select value(cli) into client1
 		from o_client cli where cli.numCli=numCli1;
 		return client1;
 		exception when no_data_found then raise no_data_found;
@@ -965,13 +969,13 @@ END;
 
 	static function getAgencyStatic (numCli1 in number) return agency_t IS
 	agency1 agency_t:=null;
-	BEGIN 
+	BEGIN
 		select deref(value(cli).refAgency) into agency1
 		from o_client cli where cli.numCLi=numCli1;
 		return agency1;
 		exception when no_data_found then raise no_data_found;
 	END;
-	
+
 	static function getAccountsStatic (numCli1 in number) return listRefAccount_t IS
 	listAccounts1 listRefAccount_t:=null;
 	BEGIN
@@ -993,22 +997,22 @@ CREATE OR REPLACE TYPE BODY TRANSACTION_T AS
 
     -- getter
     member function getTNum return number is
-    BEGIN 
+    BEGIN
         return tNum;
     END;
 
     member function getIssuer return ref client_t is
-    BEGIN 
+    BEGIN
          return self.issuer;
     END;
 
     member function getPayee return ref client_t is
-    BEGIN 
+    BEGIN
          return self.payee;
     END;
 
     member function getAmount return number is
-    BEGIN 
+    BEGIN
         return self.amount;
     END;
 
@@ -1018,8 +1022,8 @@ CREATE OR REPLACE TYPE BODY TRANSACTION_T AS
 	END;
 
 
-	member function getRefAccPayee return ref account_t is 
-	BEGIN 
+	member function getRefAccPayee return ref account_t is
+	BEGIN
 		return self.refAccPayee;
 	END;
 
@@ -1062,12 +1066,12 @@ CREATE OR REPLACE TYPE BODY TRANSACTION_T AS
 	end;
 
 END;
-/	
+/
 
 CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
-	order member function compAccount( account IN ACCOUNT_T ) return number is 
+	order member function compAccount( account IN ACCOUNT_T ) return number is
 
-	-- order en fonction du accountType puis du numero 
+	-- order en fonction du accountType puis du numero
 	position1 NUMBER := 0;
 	position2 NUMBER := 0;
 
@@ -1094,7 +1098,7 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 		IF position1 = position2 THEN return 0;
 		ELSIF position1 > position2 THEN return 1;
 		ELSIF position1 < position2 THEN return -1;
-		END IF;	
+		END IF;
 		END;
 
 
@@ -1104,7 +1108,7 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
     END;
 
     member function getAccountType return varchar2 Is
-    BEGIN 
+    BEGIN
         return self.accountType;
     END;
 
@@ -1113,12 +1117,12 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
         return self.balance;
     END;
 
-    member function getBankCeiling return number IS 
+    member function getBankCeiling return number IS
     BEGIN
         return self.bankCeiling;
     END;
 	member function getAgency return ref AGENCY_T IS
-	BEGIN 
+	BEGIN
 		return self.refAgency;
 	END;
 	member procedure updateBankCeiling(newCeiling in number) is
@@ -1136,15 +1140,15 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 					raise ;
 		END;
 
-	
+
     member function getStatements return listRefTransaction_t is
-    BEGIN 
+    BEGIN
         return statements;
     END;
-	member procedure deleteAccount(clientAccount OUT client_t) is 
+	member procedure deleteAccount(clientAccount OUT client_t) is
 
 	refAccount ref account_t;
-	
+
 
 	BEGIN
 		select ref(oa) into refAccount
@@ -1175,7 +1179,7 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 
 	member procedure updateLinkListTransaction(refTransactionToModify REF transaction_t, newRefTransaction REF transaction_t) is
 	BEGIN
-	
+
 		UPDATE TABLE(select oa.statements from o_account oa where oa.accountNo=self.accountNo) le set le.column_value=newRefTransaction
 		where le.column_value=refTransactionToModify;
 		EXCEPTION
@@ -1195,7 +1199,7 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 
 	static function getAgencyStatic (accountNo1 in number) return agency_t IS
 	agency1 agency_t:=null;
-	begin	
+	begin
 		select deref(value(acc).refAgency) into agency1
 		from o_account acc where acc.accountNo=accountNo1;
 		return agency1;
@@ -1210,7 +1214,7 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 		return listTransac;
 		EXCEPTION when NO_DATA_FOUND THEN raise no_data_found;
 	end;
-    
+
 END;
 /
 
@@ -1248,7 +1252,7 @@ END;
 
 declare
 
--- Références des locations -- 
+-- Références des locations --
 
     refLoc1        REF LOCATION_T;
     refLoc2        REF LOCATION_T;
@@ -1273,7 +1277,7 @@ declare
     refAgency8	   REF AGENCY_T;
 	refAgency9	   REF AGENCY_T;
     refAgency10	   REF AGENCY_T;
-	
+
 -- Références des Employés --
 
 	refEmp1		   REF Employe_t;
@@ -1296,7 +1300,7 @@ declare
 	refEmp18	   REF Employe_t;
     refEmp19	   REF Employe_t;
 	refEmp20  	   REF Employe_t;
-	
+
 -- Références des clients --
 
 	refClt1		   REF CLIENT_T;
@@ -1413,7 +1417,7 @@ BEGIN
 		returning ref(oa) INTO refAgency9;
     insert INTO O_AGENCY oa values(AGENCY_T(10, 'banque des cèdres', refLoc10 , listRefEmploye_T(), listRefClient_t()))
 		returning ref(oa) INTO refAgency10;
-	
+
 
 -- Employes de l'agence 1  --
 
@@ -1521,7 +1525,7 @@ BEGIN
 	refAgency3
 	))
 	returning ref(oe) INTO refEmp6;
-	
+
 -- Mise à jour de la liste des pointeurs vers les employes de l'agence 3 --
     insert into
 	TABLE(select oa.listRefEmp from O_AGENCY oa where oa.agencyNo=3) lre
@@ -1534,7 +1538,7 @@ BEGIN
 
 
 -- Employes de l'agence 4 --
-	
+
 	insert into O_EMPLOYE oe values (employe_t(
 	7,
 	'BEAUMARCHAIS',
@@ -1811,8 +1815,8 @@ BEGIN
 	values(refEmp20);
 
 
-    
--- Insertion des clients dans la table des clients -- 
+
+-- Insertion des clients dans la table des clients --
 
 	insert into O_CLIENT oc values (CLIENT_T(
 		1,
@@ -1840,7 +1844,7 @@ BEGIN
         listRefAccount_t(),
 		Empty_clob(),
 		to_date('2-2-1957','DD-MM-YYYY'),
-		refAgency2		
+		refAgency2
 	))
 	returning ref(oc) into refClt2;
 
@@ -1910,7 +1914,7 @@ BEGIN
 		to_date('6-6-1965','DD-MM-YYYY'),
 		refAgency6
 	))
-	returning ref(oc) into refClt6;	
+	returning ref(oc) into refClt6;
 
 	insert into
 	TABLE(select oa.listRefClient from O_AGENCY oa where oa.agencyNo=6) lrc
@@ -2167,7 +2171,7 @@ BEGIN
 	returning ref(oact) into refAct1;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=1) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=1) lra
 	values(refAct1);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2181,9 +2185,9 @@ BEGIN
 	returning ref(oact) into refAct2;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=2) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=2) lra
 	values(refAct2);
-	
+
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
 		3,
 		'Compte Courant',
@@ -2193,9 +2197,9 @@ BEGIN
 		refAgency3
 	))
 	returning ref(oact) into refAct3;
-	
+
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=3) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=3) lra
 	values(refAct3);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2209,7 +2213,7 @@ BEGIN
 	returning ref(oact) into refAct4;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=4) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=4) lra
 	values(refAct4);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2223,7 +2227,7 @@ BEGIN
 	returning ref(oact) into refAct5;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=5) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=5) lra
 	values(refAct5);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2235,9 +2239,9 @@ BEGIN
 		refAgency6
 	))
 	returning ref(oact) into refAct6;
-	
+
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=6) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=6) lra
 	values(refAct6);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2251,7 +2255,7 @@ BEGIN
 	returning ref(oact) into refAct7;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=7) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=7) lra
 	values(refAct7);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2265,7 +2269,7 @@ BEGIN
 	returning ref(oact) into refAct8;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=8) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=8) lra
 	values(refAct8);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2279,7 +2283,7 @@ BEGIN
 	returning ref(oact) into refAct9;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=9) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=9) lra
 	values(refAct9);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2293,7 +2297,7 @@ BEGIN
 	returning ref(oact) into refAct10;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=10) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=10) lra
 	values(refAct10);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2307,7 +2311,7 @@ BEGIN
 	returning ref(oact) into refAct11;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=11) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=11) lra
 	values(refAct11);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2321,7 +2325,7 @@ BEGIN
 	returning ref(oact) into refAct12;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=12) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=12) lra
 	values(refAct12);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2335,7 +2339,7 @@ BEGIN
 	returning ref(oact) into refAct13;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=13) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=13) lra
 	values(refAct13);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2349,7 +2353,7 @@ BEGIN
 	returning ref(oact) into refAct14;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=14) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=14) lra
 	values(refAct14);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2363,7 +2367,7 @@ BEGIN
 	returning ref(oact) into refAct15;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=15) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=15) lra
 	values(refAct15);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2377,7 +2381,7 @@ BEGIN
 	returning ref(oact) into refAct16;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=16) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=16) lra
 	values(refAct16);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2391,7 +2395,7 @@ BEGIN
 	returning ref(oact) into refAct17;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=17) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=17) lra
 	values(refAct17);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2405,7 +2409,7 @@ BEGIN
 	returning ref(oact) into refAct18;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=18) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=18) lra
 	values(refAct18);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2419,7 +2423,7 @@ BEGIN
 	returning ref(oact) into refAct19;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=19) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=19) lra
 	values(refAct19);
 
 	insert into O_ACCOUNT oact values (ACCOUNT_T(
@@ -2433,7 +2437,7 @@ BEGIN
 	returning ref(oact) into refAct20;
 
 	insert into
-	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=20) lra 
+	Table(select oc.listRefAccount from O_CLIENT oc where oc.numCli=20) lra
 	values(refAct20);
 
 -- Insertion des transactions dans la table --
@@ -2449,11 +2453,11 @@ BEGIN
 	returning ref(otr) into refTransac1;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=1) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=1) lrt
 	values(refTransac1);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=2) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=2) lrt
 	values(refTransac1);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2467,11 +2471,11 @@ BEGIN
 	returning ref(otr) into refTransac2;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=3) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=3) lrt
 	values(refTransac2);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=4) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=4) lrt
 	values(refTransac2);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2485,11 +2489,11 @@ BEGIN
 	returning ref(otr) into refTransac3;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=5) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=5) lrt
 	values(refTransac3);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=6) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=6) lrt
 	values(refTransac3);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2503,11 +2507,11 @@ BEGIN
 	returning ref(otr) into refTransac4;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=7) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=7) lrt
 	values(refTransac4);
-	
+
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=8) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=8) lrt
 	values(refTransac4);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2521,11 +2525,11 @@ BEGIN
 	returning ref(otr) into refTransac5;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=9) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=9) lrt
 	values(refTransac5);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=10) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=10) lrt
 	values(refTransac5);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2539,11 +2543,11 @@ BEGIN
 	returning ref(otr) into refTransac6;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=11) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=11) lrt
 	values(refTransac6);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=12) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=12) lrt
 	values(refTransac6);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2557,11 +2561,11 @@ BEGIN
 	returning ref(otr) into refTransac7;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=13) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=13) lrt
 	values(refTransac7);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=14) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=14) lrt
 	values(refTransac7);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2575,11 +2579,11 @@ BEGIN
 	returning ref(otr) into refTransac8;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=15) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=15) lrt
 	values(refTransac8);
-	
+
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=16) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=16) lrt
 	values(refTransac8);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2593,11 +2597,11 @@ BEGIN
 	returning ref(otr) into refTransac9;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=17) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=17) lrt
 	values(refTransac9);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=18) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=18) lrt
 	values(refTransac9);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2611,11 +2615,11 @@ BEGIN
 	returning ref(otr) into refTransac10;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=19) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=19) lrt
 	values(refTransac10);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=20) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=20) lrt
 	values(refTransac10);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2629,11 +2633,11 @@ BEGIN
 	returning ref(otr) into refTransac11;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=20) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=20) lrt
 	values(refTransac11);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=1) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=1) lrt
 	values(refTransac11);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2647,11 +2651,11 @@ BEGIN
 	returning ref(otr) into refTransac12;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=2) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=2) lrt
 	values(refTransac12);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=19) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=19) lrt
 	values(refTransac12);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2665,11 +2669,11 @@ BEGIN
 	returning ref(otr) into refTransac13;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=3) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=3) lrt
 	values(refTransac13);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=18) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=18) lrt
 	values(refTransac13);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2683,11 +2687,11 @@ BEGIN
 	returning ref(otr) into refTransac14;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=4) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=4) lrt
 	values(refTransac14);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=17) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=17) lrt
 	values(refTransac14);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2699,13 +2703,13 @@ BEGIN
 		15000
 	))
 	returning ref(otr) into refTransac15;
-	
+
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=5) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=5) lrt
 	values(refTransac15);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=16) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=16) lrt
 	values(refTransac15);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2719,11 +2723,11 @@ BEGIN
 	returning ref(otr) into refTransac16;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=6) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=6) lrt
 	values(refTransac16);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=15) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=15) lrt
 	values(refTransac16);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2737,11 +2741,11 @@ BEGIN
 	returning ref(otr) into refTransac17;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=7) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=7) lrt
 	values( refTransac17);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=14) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=14) lrt
 	values(refTransac17);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2755,11 +2759,11 @@ BEGIN
 	returning ref(otr) into refTransac18;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=8) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=8) lrt
 	values(refTransac18);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=13) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=13) lrt
 	values(refTransac18);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2773,11 +2777,11 @@ BEGIN
 	returning ref(otr) into refTransac19;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=9) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=9) lrt
 	values(refTransac19);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=12) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=12) lrt
 	values(refTransac19);
 
 	insert into O_TRANSACTION otr values (TRANSACTION_T(
@@ -2791,11 +2795,11 @@ BEGIN
 	returning ref(otr) into refTransac20;
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=10) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=10) lrt
 	values(refTransac20);
 
 	insert into
-	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=11) lrt 
+	Table(select oact.statements from O_ACCOUNT oact where oact.accountNo=11) lrt
 	values( refTransac20);
 END;
 /

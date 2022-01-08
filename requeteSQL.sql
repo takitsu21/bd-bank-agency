@@ -14,11 +14,11 @@
 --     - 5 impliquant >2 tables avec jointure interne ( 1 externe, 1 group by, 1 tri)
 
 
--- Requêtes d'access data -- 
+-- Requêtes d'access data --
 
 	set serverout on
 
-	declare 
+	declare
 
 	locationPaix location_t;
 	agency agency_t;
@@ -80,31 +80,31 @@
 end;
 /
 
--- Requêtes de suppressions -- 
+-- Requêtes de suppressions --
 
 	-- Requêtes de suppressions sur 1 table --
 
 		-- Requete 1
 		delete from o_client oc where oc.numCli=11;
         /
-        
-		
+
+
 		rollback;
 		-- Requete 2
 		delete from o_agency oa where oa.agencyNo=4;
         /
-		
+
 		rollback;
 
 
 	-- Requêtes de suppressions sur 2 tables --
 
 		-- Requete 1
-		declare 
+		declare
 		agency agency_t;
 		refOe ref employe_t;
 
-		begin 
+		begin
 
 		select value(ag) into agency from
 		o_agency ag where ag.agencyNo=1;
@@ -120,13 +120,13 @@ end;
 
 
 		-- Requete 2
-		declare 
+		declare
 		accountIssuer account_t;
 		accountPayee account_t;
 		refTrans ref transaction_t;
 
 		begin
-		
+
 		select value (ac) into accountIssuer from
 		o_account ac where ac.accountNo=1;
 
@@ -143,8 +143,8 @@ end;
 		/
 		rollback;
 
-		
-	
+
+
 	-- Requêtes de suppresions sur plus de 2 tables --
 
 		-- Requete 1
@@ -161,7 +161,7 @@ rollback;
 
 
 
--- Requêtes de mise à jour -- 
+-- Requêtes de mise à jour --
 
 	-- Requêtes sur 1 table --
 
@@ -169,7 +169,7 @@ rollback;
 		declare
 			loc location_t;
 		begin
-			select value(lo) into loc from 
+			select value(lo) into loc from
 			o_location lo where lo.country='France' and lo.city='Paris' and lo.streetName='Rue de la paix' and lo.streetNo=8;
 			loc.updateCountry('a');
 		end;
@@ -181,7 +181,7 @@ rollback;
 		declare
 			loc location_t;
 		begin
-			select value(lo) into loc from 
+			select value(lo) into loc from
 			o_location lo where lo.country='France' and lo.city='Paris' and lo.streetName='Rue de la paix';
 
 			loc.updateStreetName('Place Vendome');
@@ -194,7 +194,7 @@ rollback;
 		declare
 		cli client_t;
 		begin
-			select value(oc) into cli from 
+			select value(oc) into cli from
 			o_client oc where oc.numCli='7';
 
 			cli.updateJob('Directeur');
@@ -202,10 +202,10 @@ rollback;
 		end;
 		/
 
-	-- Requêtes sur 2 tables -- 
+	-- Requêtes sur 2 tables --
 
 		-- Requete 1
-		DECLARE 
+		DECLARE
 
 		refOe1 ref EMPLOYE_T;
 		agency agency_t;
@@ -221,22 +221,22 @@ rollback;
 
 			select value(oa), ref(oa) into agency, refAgency
 			from o_agency oa where oa.agencyNo=1;
-			
+
 			select value(oa), ref(oa) into agency2, refAgency2
 			from o_agency oa where oa.agencyNo=2;
-			
+
 			select value(oe), ref(oe) into emp1, refOe1
 			from o_employe oe where oe.empNo=1;
-			
+
 			select value(oe), ref(oe) into emp2, refOe2
 			from o_employe oe where oe.empNo=3;
-			
+
 			emp1.updateAgency(null);
 			emp2.updateAgency(refAgency);
-			
+
 			agency.updateLinkListEmploye(refOe1, refOe2);
 			agency2.deleteLinkListEmploye(refOe2);
-			
+
 
 		end;
 		/
@@ -244,7 +244,7 @@ rollback;
 
 
 		-- Requete 2
-		DECLARE 
+		DECLARE
 
 		refOe ref EMPLOYE_T;
 		agency agency_t;
@@ -276,7 +276,7 @@ rollback;
 		end;
 		/
 		rollback;
-                                                                                                         
+
 	-- Requêtes sur plus de 2 tables --
 
 		-- Requete 1
@@ -284,19 +284,19 @@ rollback;
 		where ot.amount > 3000 and ot.issuer.job='Ecrivain'
 		and ot.issuer.refAgency.loc.country='France') set amount=5000;
 		/
-		
+
 		-- Requete 2
 		update (select * from o_employe oe
 		where oe.empNo>5 and oe.refAgency.agencyNo>5
 		and oe.refAgency.loc.country='USA') set sal=10000;
 		/
-	
-	 
+
+
 
 -- Requêtes de consultations --
 
 	-- Requêtes sur 1 table --
-		
+
 		-- Requete 1 avec order by
 		select ag.agencyNo, ag.aName
 		from o_agency ag
@@ -307,17 +307,17 @@ rollback;
 		select ot.payee, SUM(ot.amount) from o_transaction ot
 		group by ot.payee;
 		/
-    
+
 
 		-- Requete 3
 			select * from o_account oa where oa.accountType='PEL';
 			/
 
 		-- Requete 4
-			select * from o_client oc 
+			select * from o_client oc
 			where oc.job='Médecin';
 			/
-	
+
 		-- Requete 5
 			select * from o_employe oe
 			where oe.sal > 2000;
@@ -325,31 +325,19 @@ rollback;
 
 	-- Requêtes sur 2 tables --
 
-		-- Requete 1 avec externe ? 
+		-- Requete 1 avec interne
 
 			select * from o_transaction ot left join o_client oc on ot.issuer.numCli=oc.numCli
 			where ot.issuer.numCli=1;
 			/
 
-			select * from o_transaction ot left outer join o_client oc 
-			on (ot.issuer.numCli=oc.numCli and oc.job='Médecin')
-			where ot.issuer.job='Médecin';
-			/
-
-			SELECT *
-			FROM o_transaction ot
-				left outer join o_agency oa 
-					on( ot.payee.refAgency.agencyNo = oa.agencyNo );
-					/
-			
-
 		-- Requete 2 avec group by
-		
-			select ot.issuer.cName, SUM(ot.amount) 
-			from o_transaction ot where ot.issuer.refAgency.agencyNo=1 
+
+			select ot.issuer.cName, SUM(ot.amount)
+			from o_transaction ot where ot.issuer.refAgency.agencyNo=1
 			group by ot.issuer;
 			/
-	
+
 
 		-- Requete 3 avec tri / order by
 			select * from o_transaction ot where ot.issuer.refAgency.aName='pine bank' and ot.amount > 3000
@@ -357,23 +345,27 @@ rollback;
 			/
 
 
-		-- Requete 4
-			select * from o_transaction ot
-			where ot.amount > 3000 and ot.issuer.job='Vétérinaire';
+		-- Requete 4 avec externe
+			select * from o_transaction ot left outer join o_client oc
+			on (ot.issuer.numCli=oc.numCli and oc.job='Médecin');
 			/
-		
+
 		-- Requete 5
-			select * from o_client oc 
+			select * from o_client oc
 			where oc.job='Ingenieur' and oc.refAgency.aName='agence le cèdre';
 			/
 
 
 	-- Requêtes sur plus de 2 tables --
 
-		-- Requete 1 avec externe ? 
-			SELECT * FROM o_transaction  ot LEFT JOIN o_client oc ON ot.payee.numCli = oc.numCli 
-			where ot.issuer.refAgency.loc.country='France';
-			/ 
+		-- Requete 1 avec externe ?
+
+
+			SELECT *
+			FROM o_transaction ot
+				left outer join o_agency oa
+					on(ot.payee.refAgency.agencyNo = oa.agencyNo and oa.loc.country='Italie');
+					/
 
 		-- Requete 2 avec group by
 			select ot.issuer.numCli, ot.issuer.cName, ot.issuer.prenoms, ot.issuer.job, SUM(ot.amount) from o_transaction ot
@@ -387,12 +379,10 @@ rollback;
 			and ot.issuer.refAgency.loc.country='France' ORDER BY issuer.cName DESC;
 			/
 
-		-- Requete 4
-			select * from o_transaction ot
-			where ot.amount > 3000 and ot.issuer.birthDate > to_date('11-12-1960','DD-MM-YYYY')
-			and ot.refAccIssuer.accountType='Livret A';
+		-- Requete 4 interne
+			SELECT * FROM o_transaction  ot LEFT JOIN o_client oc ON ot.payee.numCli = oc.numCli
+			where ot.issuer.refAgency.loc.country='France';
 			/
-
 
 		-- Requete 5
 			select * from o_transaction ot
