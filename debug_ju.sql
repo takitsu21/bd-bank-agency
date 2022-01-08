@@ -228,6 +228,8 @@ CREATE OR REPLACE type TRANSACTION_T as OBJECT(
 
 	-- consultation --
 	static function getTransactionStatic (tNum1 in number) return transaction_t
+	-- static function getIssuerStatic (tNum1 in number) return client_t,
+	-- static function getPayeeStatic (tNum1 in number) return client_t,
 );
 /
 
@@ -986,18 +988,22 @@ CREATE OR REPLACE TYPE BODY TRANSACTION_T AS
     BEGIN 
         return tNum;
     END;
+
     member function getIssuer return ref client_t is
     BEGIN 
          return self.issuer;
     END;
+
     member function getPayee return ref client_t is
     BEGIN 
          return self.payee;
     END;
+
     member function getAmount return number is
     BEGIN 
         return self.amount;
     END;
+
 	-- member procedure
 
 	static function getTransactionStatic (tNum1 in number) return transaction_t is

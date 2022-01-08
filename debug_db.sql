@@ -150,7 +150,6 @@ CREATE OR REPLACE TYPE EMPLOYE_T AS OBJECT(
 
 	-- consultation --
 	static function getEmployeStatic(empNo1 in number) return employe_t
-	--static function getAgencyStatic(empNo1 in number) return agency_t
 );
 /
 
@@ -223,12 +222,15 @@ CREATE OR REPLACE type TRANSACTION_T as OBJECT(
     member function getTNum return number,
   	member function getIssuer return ref client_t,
     member function getPayee return ref client_t,
-    member function getAmount return number
-
+    member function getAmount return number,
+	member function getRefAccIssuer return ref account_t,
+	member function getRefAccPayee return ref account_t,
+	
 	-- consultation --
-	-- static function getTransactionStatic (tNum1 in number) return transaction_t,
+	static function getTransactionStatic (tNum1 in number) return transaction_t
 	-- static function getIssuerStatic (tNum1 in number) return client_t,
 	-- static function getPayeeStatic (tNum1 in number) return client_t,
+
 );
 /
 
@@ -263,11 +265,13 @@ CREATE OR REPLACE type ACCOUNT_T AS OBJECT(
 
 	member procedure addLinkListTransaction(refTransactionToAdd REF transaction_t),
 	member procedure deleteLinkListTransaction(refTransactionToDelete REF transaction_t),
-	member procedure updateLinkListTransaction(refTransactionToModify REF transaction_t, newRefTransaction REF transaction_t)
+	member procedure updateLinkListTransaction(refTransactionToModify REF transaction_t, newRefTransaction REF transaction_t),
 
 	-- consultation --
-	-- static function getAccountStatic (accountNo in number) return account_t,
-	-- static function getAgencyStatic (accountNo in number) return agency_t,
+	static function getAccountStatic (accountNo1 in number) return account_t,
+	static function getAgencyStatic (accountNo1 in number) return agency_t,
+	static function getStatementsStatic (accountNo1 in number) return listRefTransaction_t
+
 );
 /
 CREATE OR REPLACE type listRefAccount_t as table of REF ACCOUNT_T
@@ -288,6 +292,7 @@ CREATE OR REPLACE TYPE CLIENT_T AS OBJECT(
 	map member function compCli return number,
     
     member function getCName return varchar2,
+	member function getNumCli return number,
     member function getJob return varchar2,
     member function getSal return number,
     member function getProject return CLOB,
@@ -305,12 +310,15 @@ CREATE OR REPLACE TYPE CLIENT_T AS OBJECT(
 	-- update link 
 	member procedure addLinkListAccount(refAccToAdd REF account_t),
 	member procedure deleteLinkListAccount(refAccToDelete REF account_t),
-	member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t)
+	member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t),
 
 	-- Consultation --
-	-- static function getClientStatic (numCli in number) return client_t,
-	-- static function getAgencyStatic (numCli in number) return agency_t,
-	-- static function getAccountsStatic (numCli in number) return listRefAccounts_t,
+	static function getClientStatic (numCli1 in number) return client_t,
+	static function getAgencyStatic (numCli1 in number) return agency_t,
+	static function getAccountsStatic (numCli1 in number) return listRefAccount_t,
+
+	--supression
+	member procedure deleteClient 
 
 );
 /
@@ -322,6 +330,16 @@ ALTER TYPE ACCOUNT_T ADD
 ALTER TYPE EMPLOYE_T ADD
     static function getAgencyStatic(empNo1 in number) return agency_t cascade;
 /  
+
+ALTER TYPE TRANSACTION_T ADD
+	static function getIssuerStatic (tNum1 in number) return client_t cascade;
+/
+
+ALTER TYPE TRANSACTION_T ADD
+	static function getPayeeStatic (tNum1 in number) return client_t cascade;
+/
+
+
 -- TABLES OBJETS --
 
 
@@ -836,6 +854,10 @@ CREATE OR REPLACE TYPE BODY CLIENT_T AS
     BEGIN 
         return cName;
     END;
+	member function getNumCli return number is
+	BEGIN
+		return numCli;
+	END;
     member function getJob return varchar2 is
     BEGIN 
         return job;
@@ -893,6 +915,11 @@ CREATE OR REPLACE TYPE BODY CLIENT_T AS
     	return listRefAccount;
     END;
 
+	member procedure deleteClient is 
+	begin 
+		delete from o_client cli where cli.numCLi=self.numCLi; 
+	end;
+
   member function getAgency return REF AGENCY_T is
    BEGIN 
       return self.refAgency;
@@ -915,8 +942,8 @@ BEGIN
 
 END;
 
-member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t) IS 
-BEGIN
+	member procedure updateLinkListAccount(refAccToModify REF account_t, newRefAcc REF account_t) IS 
+	BEGIN
 
 		UPDATE TABLE(select oc.listRefAccount from o_client oc where oc.numCli=self.numCli) le
 		set le.column_value=newRefAcc
@@ -925,38 +952,34 @@ BEGIN
 		EXCEPTION
 			when OTHERS then
 				raise;
-END;
+	END;
 
+	static function getClientStatic (numCli1 in number) return client_t IS
+	client1 client_t:=null;
+	BEGIN
+		select value(cli) into client1 
+		from o_client cli where cli.numCli=numCli1;
+		return client1;
+		exception when no_data_found then raise no_data_found;
+		END;
 
-	-- static function getClientStatic (numCli1 in number) return client_t IS
-	-- client1 client_t:=null;
-	-- BEGIN
-		-- select value(cli) into client1 
-		-- from o_client cli where cli.numCli=numCli1;
-		-- return client1;
-		-- exception when no_data_found then raise no_data_found;
-	-- END;
-
-	-- static function getAgencyStatic (numCli1 in number) return agency_t IS
-	-- agency1 agency_t:=null;
-	-- BEGIN 
-		-- select deref(cli.refAgency) into agency1
-		-- from o_client cli where cli.numCLi=numCli1;
-		-- return agency1;
-		-- exception when no_data_found then raise no_data_found;
-	--END;
+	static function getAgencyStatic (numCli1 in number) return agency_t IS
+	agency1 agency_t:=null;
+	BEGIN 
+		select deref(value(cli).refAgency) into agency1
+		from o_client cli where cli.numCLi=numCli1;
+		return agency1;
+		exception when no_data_found then raise no_data_found;
+	END;
 	
-	-- static function getAccountsStatic (numCli1 in number) return listRefAccounts_t IS
-	-- listAccounts1 listRefAccounts:=null;
-	-- BEGIN
-		-- select CAST( COLLECT (deref(le.column_value)) AS listRefAcounts_t) INTO listAccounts1
-		-- from table( select cli.listRefAccount from o_client cli where cli.numCli=numCli1) le;
-		-- return listAccounts;
-		-- exception when no_data_found then raise no_data_found;
-	-- END;
-	
-
-
+	static function getAccountsStatic (numCli1 in number) return listRefAccount_t IS
+	listAccounts1 listRefAccount_t:=null;
+	BEGIN
+		select CAST( COLLECT (deref(le.column_value)) AS listRefAccount_t) INTO listAccounts1
+		from table( select cli.listRefAccount from o_client cli where cli.numCli=numCli1) le;
+		return listAccounts1;
+		exception when no_data_found then raise no_data_found;
+	END;
 
 END;
 /
@@ -973,52 +996,70 @@ CREATE OR REPLACE TYPE BODY TRANSACTION_T AS
     BEGIN 
         return tNum;
     END;
+
     member function getIssuer return ref client_t is
     BEGIN 
          return self.issuer;
     END;
+
     member function getPayee return ref client_t is
     BEGIN 
          return self.payee;
     END;
+
     member function getAmount return number is
     BEGIN 
         return self.amount;
     END;
+
+	member function getRefAccIssuer return ref account_t is
+	BEGIN
+		return self.refAccIssuer;
+	END;
+
+
+	member function getRefAccPayee return ref account_t is 
+	BEGIN 
+		return self.refAccPayee;
+	END;
+
+
+
+
 	-- member procedure
 
-	-- static function getTransactionStatic (tNum1 in number) return transaction_t is
-	--return transaction_t IS transaction1 transaction_t:=null;
-	-- begin
-		-- select value(transac) into transaction1 from o_transaction transac
-		-- where transac.tNum=tNum1;
-		-- return transaction1;
-	-- Exception
-		-- WHEN NO_DATA_FOUND THEN
-			-- raise no_data_found;
-	-- end;
+	static function getTransactionStatic (tNum1 in number) return transaction_t is
+	transaction1 transaction_t:=null;
+	begin
+		select value(transac) into transaction1 from o_transaction transac
+		where transac.tNum=tNum1;
+		return transaction1;
+	Exception
+		WHEN NO_DATA_FOUND THEN
+			raise no_data_found;
+	end;
 
-	-- static function getIssuerStatic (tNum1 in number) return client_t is
-	-- return client_t IS client1 client_t:=null;
-	-- begin
-		-- select value(transac.issuer) into client1 from o_transaction transac
-		-- where transac.tNum=tNum1;
-		-- return client1;
-	-- Exception
-		-- WHEN NO_DATA_FOUND THEN
-			-- raise no_data_found;
-	-- end;
+	static function getIssuerStatic (tNum1 in number) return client_t is
+	client1 client_t:=null;
+	begin
+		select deref(value(transac).issuer) into client1 from o_transaction transac
+		where transac.tNum=tNum1;
+		return client1;
+	Exception
+		WHEN NO_DATA_FOUND THEN
+			raise no_data_found;
+	end;
 
-	-- static function getPayeeStatic (tNum1 in number) return client_t IS
-	-- return client_t IS client1 client_t:=null;
-	-- begin
-		-- select value(transac.payee) into client1 from o_transaction transac
-		-- where transac.tNum=tNum1;
-		-- return client1;
-	-- Exception
-		-- WHEN NO_DATA_FOUND THEN
-			-- raise no_data_found;
-	-- end;
+	static function getPayeeStatic (tNum1 in number) return client_t IS
+	client1 client_t:=null;
+	begin
+		select deref(value(transac).payee) into client1 from o_transaction transac
+		where transac.tNum=tNum1;
+		return client1;
+	Exception
+		WHEN NO_DATA_FOUND THEN
+			raise no_data_found;
+	end;
 
 END;
 /	
@@ -1142,28 +1183,33 @@ CREATE OR REPLACE TYPE BODY ACCOUNT_T AS
 				raise;
 	END;
 
-	-- static function getAccountStatic (accountNo1 in number) return account_t IS
-		-- return account_t IS
-		--dept1 dept_t:=null;
-	-- begin
-	-- select value(od) into dept1 from dept_o od where od.deptno=deptno1;
-	-- return dept1;
-	-- Exception
-	--	WHEN NO_DATA_FOUND THEN
-	--		raise no_data_found;
-	--end;
+	static function getAccountStatic (accountNo1 in number) return account_t IS
+	account1 account_t:=null;
+	begin
+		select value(acc) into account1 from o_account acc where acc.accountNo=accountNo1;
+		return account1;
+		Exception
+		WHEN NO_DATA_FOUND THEN
+			raise no_data_found;
+	end;
 
-	-- static function getAgencyStatic (accountNo1 in number) return agency_t IS
-	--	return dept_t IS
-	--	dept1 dept_t:=null;
-	-- begin
-	-- select value(od) into dept1 from dept_o od where od.deptno=deptno1;
-	-- return dept1;
-	-- Exception
-	--	WHEN NO_DATA_FOUND THEN
-	--		raise no_data_found;
-	--end;
+	static function getAgencyStatic (accountNo1 in number) return agency_t IS
+	agency1 agency_t:=null;
+	begin	
+		select deref(value(acc).refAgency) into agency1
+		from o_account acc where acc.accountNo=accountNo1;
+		return agency1;
+		exception when no_data_found then raise no_data_found;
+	end;
 
+	static function getStatementsStatic (accountNo1 in number) return listRefTransaction_t IS
+	listTransac listRefTransaction_t:=null;
+	begin
+		select CAST ( COLLECT (deref(le.column_value)) AS listRefTransaction_t) INTO listTransac
+		FROM TABLE( select acc.statements from o_account acc where acc.accountNo=accountNo1) le;
+		return listTransac;
+		EXCEPTION when NO_DATA_FOUND THEN raise no_data_found;
+	end;
     
 END;
 /
@@ -1324,7 +1370,7 @@ BEGIN
 
 -- Insertion des locations des agences --
 
-    insert INTO O_LOCATION ol values(location_t('France','Nice','Place Mascena',42))
+    insert INTO O_LOCATION ol values(location_t('France','Nice','Place Masséna',42))
         returning ref(ol) INTO refLoc1;
     insert INTO O_LOCATION ol values(location_t('France','Paris','Rue de la paix',8))
         returning ref(ol) INTO refLoc2;
@@ -1338,7 +1384,7 @@ BEGIN
 		returning ref(ol) INTO refLoc6;
 	insert INTO O_LOCATION ol values(location_t('USA', 'Los Angeles', 'Avenue de Venise Beach', 4))
 		returning ref(ol) INTO refLoc7;
-	insert INTO O_LOCATION ol values(location_t('Espagne', 'Madrid', 'Route de la pealla', 10))
+	insert INTO O_LOCATION ol values(location_t('Espagne', 'Madrid', 'Route de la paella', 10))
 		returning ref(ol) INTO refLoc8;
 	insert INTO O_LOCATION ol values(location_t('Norvège', 'Oslo', 'Place du port', 1))
 	returning ref(ol) INTO refLoc9;
