@@ -1,1 +1,6 @@
 .vs
+.idea
+target/
+java.iml
+bd-bank-agency.iml
+*.class
